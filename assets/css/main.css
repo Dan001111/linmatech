@@ -1,0 +1,2329 @@
+/* ==========================================================================
+   Linma Electronics — дизайн-система
+   Палитра: тёмно-бирюзовая база + циан текущего сайта + зелёный акцент
+   из презентации. Правки цветов и отступов делаются только в :root.
+   ========================================================================== */
+
+:root {
+  /* Фон и поверхности */
+  --bg:            #061518;
+  --bg-2:          #08201F;
+  --bg-3:          #0A2827;
+  --surface:       rgba(14, 42, 43, .66);
+  --surface-solid: #0E2A2B;
+  --surface-2:     #123634;
+
+  /* Акценты */
+  --accent:        #00FCFA;   /* циан текущего сайта */
+  --brand:         #03999B;   /* бирюза логотипа */
+  --brand-soft:    #1E9B96;
+  --green:         #2BE86A;   /* индикаторы из презентации */
+  --blue:          #003796;
+
+  /* Текст */
+  --text:          #EAF6F5;
+  --text-muted:    #9FBDBB;
+  --text-dim:      #6E8F8E;
+
+  /* Линии */
+  --line:          rgba(0, 252, 250, .14);
+  --line-soft:     rgba(154, 200, 198, .12);
+
+  /* Типографика */
+  --font-head: "Montserrat", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+
+  /* Верхняя граница подобрана так, чтобы «кондиционирования» — самое длинное
+     слово заголовка — помещалось в текстовую колонку героя на любой ширине.
+     Колонка сузилась ради крупного логотипа, поэтому и кегль ниже. */
+  --fs-hero:  clamp(1.65rem, .8rem + 2.5vw, 2.9rem);
+  --fs-h1:    clamp(1.6rem, 1rem + 2.8vw, 3.5rem);
+  --fs-h2:    clamp(1.45rem, 1rem + 2vw, 2.75rem);
+  --fs-h3:    clamp(1.08rem, .95rem + .58vw, 1.42rem);
+  --fs-lead:  clamp(1rem, .95rem + .38vw, 1.25rem);
+
+  /* Ритм */
+  --container: 1240px;
+  --gutter: clamp(1.15rem, .6rem + 2vw, 2.5rem);
+  --section-y: clamp(3.75rem, 2rem + 6vw, 8rem);
+  --radius:    18px;
+  --radius-lg: 26px;
+
+  --shadow: 0 26px 60px -28px rgba(0, 0, 0, .85);
+  --ease: cubic-bezier(.22, .68, .36, 1);
+}
+
+/* --------------------------------------------------------------- Базовое */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Фоновая графика печатной платы + мягкие свечения */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(900px 600px at 12% -6%,  rgba(3, 153, 155, .26), transparent 62%),
+    radial-gradient(760px 560px at 92% 8%,   rgba(0, 55, 150, .22),  transparent 60%),
+    radial-gradient(820px 640px at 50% 108%, rgba(3, 153, 155, .16), transparent 62%),
+    var(--bg);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url("../img/bg-circuit.svg") repeat 0 0 / 760px auto;
+  opacity: .06;
+}
+
+img, svg, video { max-width: 100%; display: block; }
+img { height: auto; }
+
+a { color: var(--accent); text-decoration: none; transition: color .2s var(--ease); }
+a:hover { color: var(--text); }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.02em;
+  margin: 0 0 .6em;
+  text-wrap: balance;
+}
+
+/* Аварийная сетка для длинных русских слов («кондиционирования»):
+   только на узких экранах, иначе balance начинает рвать слова на десктопе. */
+@media (max-width: 560px) {
+  h1, h2, h3, h4 {
+    text-wrap: normal;
+    overflow-wrap: break-word;
+  }
+}
+
+p { margin: 0 0 1.1em; }
+p:last-child { margin-bottom: 0; }
+
+ul, ol { margin: 0; padding: 0; list-style: none; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px; left: 1rem;
+  z-index: 200;
+  padding: .7rem 1.2rem;
+  background: var(--accent);
+  color: #04191A;
+  font-weight: 600;
+  border-radius: 10px;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ---------------------------------------------------------- Раскладка */
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section { padding-block: var(--section-y); position: relative; }
+.section--tight { padding-block: clamp(2.5rem, 1.5rem + 3.5vw, 4.5rem); }
+
+.section-head { max-width: 62ch; margin-bottom: clamp(2rem, 1.2rem + 2.4vw, 3.5rem); }
+.section-head--center { margin-inline: auto; text-align: center; }
+.section-head h2 { font-size: var(--fs-h2); margin-bottom: .5em; }
+.section-head p { color: var(--text-muted); font-size: var(--fs-lead); }
+
+/* Подзаголовок-перечисление: под «Типы оборудования» и под «Что мы
+   производим». Это список, а не проза, и в обычной мере в 62 знака он
+   рвался на три строки с обрывком в конце. Расширяем строку до 910px:
+   при ней вентиляция и кондиционирование укладываются в две строки,
+   отопление, дымоудаление и номенклатура производства — тоже (последняя
+   от 700px и шире; ниже в две строки она физически не помещается).
+   Заголовок оставляем в прежней мере, иначе он растянется на всю ширину. */
+.section-head--list { max-width: 910px; }
+.section-head--list h2 { max-width: 62ch; }
+
+/* Для длинного пояснения под заголовком. Абзац в 62 знака разворачивался
+   в четыре строки и отодвигал содержимое секции от её названия. Строка
+   шире, кегль чуть ниже заголовочного лида, отступ снизу меньше — блок
+   становится компактнее, а текст читается как подзаголовок, а не как
+   самостоятельный абзац. */
+.section-head--lede {
+  max-width: 76ch;
+  margin-bottom: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem);
+}
+.section-head--lede > p:not(.eyebrow) {
+  font-size: clamp(.98rem, .93rem + .3vw, 1.14rem);
+  line-height: 1.62;
+  max-width: 68ch;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 1.1rem;
+  font-family: var(--font-head);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+/* Наднадпись почти всегда лежит внутри .section-head, а тамошнее правило
+   `.section-head p` перебивает .eyebrow по специфичности — наднадписи
+   набирались кеглем и цветом лида. Возвращаем им собственные значения. */
+.section-head .eyebrow { font-size: .72rem; color: var(--accent); }
+
+.eyebrow::before {
+  content: "";
+  width: 26px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+}
+.section-head--center .eyebrow::after {
+  content: "";
+  width: 26px; height: 1px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.grid { display: grid; gap: clamp(1rem, .6rem + 1.2vw, 1.75rem); }
+.grid--2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid--3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid--4 { grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); }
+/* auto-fit не обещает ровно четыре колонки: не хватает буквально десятка
+   пикселей — и четвёртая карточка уезжает на вторую строку, что читается
+   как ошибка вёрстки. Начиная с 1200px колонки задаём жёстко. Порог именно
+   такой, потому что ниже в карточку перестаёт помещаться в одну строку
+   самое длинное слово заголовка — «Кондиционирование». */
+@media (min-width: 1200px) {
+  .grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ------------------------------------------------------------- Кнопки */
+
+.btn {
+  --btn-bg: var(--accent);
+  --btn-fg: #04191A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  padding: .95rem 1.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-head);
+  font-size: .92rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 100%;
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease), background .22s var(--ease), color .22s var(--ease);
+}
+
+/* На узких экранах длинные подписи («Подробнее о комплексной поставке»)
+   не помещаются в строку — разрешаем перенос. */
+@media (max-width: 520px) {
+  .btn { white-space: normal; text-align: center; }
+}
+.btn:hover {
+  color: var(--btn-fg);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px -14px rgba(0, 252, 250, .6);
+}
+.btn:active { transform: translateY(0); }
+
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.btn--ghost:hover {
+  --btn-fg: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent), 0 14px 34px -20px rgba(0, 252, 250, .5);
+}
+
+.btn--green { --btn-bg: var(--green); }
+.btn--green:hover { box-shadow: 0 14px 34px -14px rgba(43, 232, 106, .55); }
+
+.btn--lg { padding: 1.1rem 2.1rem; font-size: 1rem; }
+/* Для кнопок внутри карточек: обычная перевешивает содержимое карточки */
+.btn--sm { padding: .68rem 1.25rem; font-size: .85rem; }
+.btn--block { width: 100%; }
+
+.btn .arrow { transition: transform .22s var(--ease); }
+.btn:hover .arrow { transform: translate(3px, -3px); }
+
+/* Текстовая ссылка со стрелкой */
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-family: var(--font-head);
+  font-size: .88rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.link-arrow svg { transition: transform .22s var(--ease); }
+.link-arrow:hover svg { transform: translateX(4px); }
+
+/* ---------------------------------------------------- Карточка-стекло */
+
+.card {
+  /* Подсветка следует за курсором: координаты подставляет main.js.
+     Пока указателя нет, пятно уведено за пределы карточки и невидимо.
+     Это фоновый слой, а не отдельный элемент, — он не перекрывает текст. */
+  --spot-x: -400px;
+  --spot-y: -400px;
+  --spot: radial-gradient(260px circle at var(--spot-x) var(--spot-y),
+            rgba(0, 252, 250, .17), rgba(43, 232, 106, .07) 42%, transparent 68%);
+
+  position: relative;
+  padding: clamp(1.4rem, 1rem + 1.2vw, 2.1rem);
+  border-radius: var(--radius);
+  background: var(--spot), linear-gradient(160deg, var(--surface-solid), rgba(6, 21, 24, .82));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+/* Градиентная рамка в 1px */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(150deg, rgba(0, 252, 250, .42), rgba(0, 252, 250, .06) 42%, transparent 72%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity .3s var(--ease);
+}
+.card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+
+/* Кромка карточки разгорается под курсором — вместе с бегущей подсветкой
+   это и даёт ощущение перехода с карточки на карточку. */
+.card:hover::before {
+  background: linear-gradient(150deg, rgba(0, 252, 250, .8), rgba(0, 252, 250, .18) 45%, rgba(43, 232, 106, .1) 75%);
+}
+
+/* Заголовки внутри карточек живут в узких колонках: длинные слова
+   («Кондиционирование», «Дымоудаление») переносим, а не обрезаем. */
+.card h3 {
+  text-wrap: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Пульсирующий индикатор — калька с карточек 01–04 в презентации */
+.dot {
+  position: relative;
+  width: 14px; height: 14px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 5px rgba(43, 232, 106, .18), 0 0 22px 4px rgba(43, 232, 106, .55);
+}
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid rgba(43, 232, 106, .55);
+  animation: pulse 2.6s var(--ease) infinite;
+}
+@keyframes pulse {
+  0%   { transform: scale(.8); opacity: .9; }
+  70%  { transform: scale(2.1); opacity: 0; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+/* ------------------------------------------------------------- Шапка */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6, 21, 24, .72);
+  border-bottom: 1px solid transparent;
+  transition: border-color .25s var(--ease), background .25s var(--ease);
+}
+/* Размытие живёт на псевдоэлементе, а не на самой шапке. Причина не
+   декоративная: backdrop-filter делает элемент содержащим блоком для
+   потомков с position: fixed. Пока он стоял на .site-header, мобильное
+   меню (position: fixed; inset: 74px 0 0) отсчитывалось не от окна,
+   а от шапки высотой 75px — и раскрывалось в полоску высотой 72px
+   под ней, то есть визуально не открывалось вовсе. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  pointer-events: none;
+}
+.site-header.is-stuck {
+  border-bottom-color: var(--line-soft);
+  background: rgba(6, 21, 24, .92);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  /* Плотность подобрана так, чтобы логотип, меню, телефон и кнопка
+     помещались в контентную колонку (1240px) и не выбивались из неё. */
+  gap: clamp(1rem, .4rem + 1.1vw, 1.6rem);
+  min-height: 74px;
+}
+
+.logo { flex: none; display: flex; align-items: center; }
+.logo img { width: 118px; height: auto; }
+
+/* Разрядка и кегль были ужаты под шесть пунктов меню. После того как
+   «Комплексная поставка» уехала, в строке освободилось место — возвращаем
+   нормальные значения. Замеры: шапка с телефоном требует ~1020px, без
+   телефона ~875px, отсюда и пороги в медиа-запросах ниже. */
+.nav { margin-left: auto; }
+.nav-list { display: flex; align-items: center; gap: clamp(.5rem, .15rem + .8vw, 1.25rem); }
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .55rem .35rem;
+  color: var(--text);
+  font-family: var(--font-head);
+  font-size: .86rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nav-link:hover, .nav-item.is-current > .nav-link { color: var(--accent); }
+/* Текущий раздел выделяем цветом и лёгким утолщением штриха.
+   Именно штрихом, а не font-weight: полужирное начертание шире обычного,
+   из-за него строка меню меняла ширину от страницы к странице и пункты
+   переезжали на 1–2px при каждом переходе. Обводка в четверть пикселя
+   даёт ту же плотность, не трогая ширину букв. */
+.nav-item.is-current > .nav-link { -webkit-text-stroke: .25px currentColor; }
+
+.nav-item { position: relative; }
+.nav-item--has-menu > .nav-link::after {
+  content: "";
+  width: 6px; height: 6px;
+  margin-left: .15rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .22s var(--ease);
+}
+.nav-item--has-menu:hover > .nav-link::after,
+.nav-item--has-menu:focus-within > .nav-link::after { transform: translateY(1px) rotate(225deg); }
+
+.submenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  min-width: 264px;
+  padding: .5rem;
+  border-radius: 16px;
+  background: rgba(10, 34, 35, .97);
+  box-shadow: inset 0 0 0 1px var(--line-soft), var(--shadow);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -8px);
+  transition: opacity .22s var(--ease), transform .22s var(--ease), visibility .22s;
+}
+.nav-item--has-menu:hover .submenu,
+.nav-item--has-menu:focus-within .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+.submenu a {
+  display: flex;
+  align-items: baseline;
+  gap: .7rem;
+  padding: .6rem .8rem;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: .88rem;
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.submenu a:hover { background: rgba(0, 252, 250, .08); color: var(--accent); }
+.submenu .num {
+  font-family: var(--font-head);
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: .08em;
+}
+
+.header-actions { display: flex; align-items: center; gap: .9rem; flex: none; }
+.header-actions .btn { padding: .88rem 1.5rem; font-size: .87rem; }
+
+.header-phone {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  color: var(--text);
+  font-family: var(--font-head);
+  font-size: .9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  /* Меню прижато вправо (margin-left: auto), поэтому его положение зависит
+     от ширины этого блока. А она чуть плавает: цифры телефона и часов
+     набраны латинским набором шрифта, и пока он грузится, строка занимает
+     143px вместо 141,8px — меню съезжает на пиксель.
+
+     Замеры обоих состояний: фирменный 141,8px, запасной 143px. Берём
+     большее с запасом, чтобы ширина не менялась ни при каком раскладе. */
+  min-width: 146px;
+}
+.header-phone small {
+  font-family: var(--font-body);
+  font-size: .68rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  letter-spacing: .02em;
+}
+.header-phone:hover { color: var(--accent); }
+
+.burger {
+  display: none;
+  width: 44px; height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  cursor: pointer;
+}
+.burger span {
+  display: block;
+  width: 18px; height: 1.5px;
+  margin: 4px auto;
+  background: var(--text);
+  transition: transform .25s var(--ease), opacity .25s var(--ease);
+}
+.burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+.burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+/* Телефон в шапке уходит первым: без него меню помещается в строку почти
+   до планшетной ширины. Пороги выставлены по замерам, а не на глаз: шапке
+   с телефоном нужно около 1020px, без телефона — около 875px. */
+@media (max-width: 1119px) {
+  .header-phone { display: none; }
+}
+
+@media (max-width: 999px) {
+  .burger { display: block; order: 3; }
+  .header-phone { display: none; }
+  .header-actions .btn { display: none; }
+
+  .nav {
+    position: fixed;
+    inset: 74px 0 0;
+    margin: 0;
+    padding: 1.5rem var(--gutter) 3rem;
+    background: rgba(6, 21, 24, .98);
+    backdrop-filter: blur(20px);
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity .25s var(--ease), transform .25s var(--ease), visibility .25s;
+  }
+  .nav.is-open { opacity: 1; visibility: visible; transform: translateY(0); }
+
+  .nav-list { flex-direction: column; align-items: stretch; gap: 0; }
+  .nav-item { border-bottom: 1px solid var(--line-soft); }
+  .nav-link { padding: 1rem .2rem; font-size: 1.05rem; justify-content: space-between; }
+
+  /* Здесь подменю — не выпадающая карточка, а просто вложенный список.
+     Селекторы с :hover и :focus-within повторены намеренно: медиа-запрос
+     специфичность не повышает, и без них десктопное правило
+     «.nav-item--has-menu:focus-within .submenu» перебивало сброс. После
+     тапа пункт остаётся в фокусе — его подменю уезжало на половину своей
+     ширины влево и обрезалось краем экрана, а у соседнего пункта, который
+     фокуса не получал, всё было нормально. */
+  .submenu,
+  .nav-item--has-menu:hover .submenu,
+  .nav-item--has-menu:focus-within .submenu {
+    position: static;
+    left: auto;
+    min-width: 0;
+    padding: 0 0 .8rem;
+    background: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    display: none;
+  }
+  .nav-item--has-menu.is-open .submenu,
+  .nav-item--has-menu.is-open:hover .submenu,
+  .nav-item--has-menu.is-open:focus-within .submenu { display: block; }
+
+  /* Пункты подменю крупнее и во всю ширину: на телефоне это обычные
+     ссылки, по которым надо попадать пальцем, а не строки выпадашки. */
+  .submenu a { padding: .7rem .2rem; font-size: .98rem; gap: .6rem; }
+  .submenu .num { font-size: .78rem; }
+
+  /* Стрелка отвечает за раскрытие, а не за фокус: иначе после тапа она
+     оставалась повёрнутой вверх у закрытого пункта. */
+  .nav-item--has-menu:hover > .nav-link::after,
+  .nav-item--has-menu:focus-within > .nav-link::after { transform: translateY(-2px) rotate(45deg); }
+  .nav-item--has-menu.is-open > .nav-link::after { transform: translateY(1px) rotate(225deg); }
+
+  .nav-mobile-cta { margin-top: 1.75rem; display: grid; gap: .75rem; }
+}
+@media (min-width: 1000px) { .nav-mobile-cta { display: none; } }
+
+/* --------------------------------------------------------------- Hero */
+
+/* overflow: hidden — свечение логотипа шире своей колонки и иначе
+   вылезает за правый край вьюпорта. */
+.hero { position: relative; overflow: hidden; padding-block: clamp(3.5rem, 2rem + 7vw, 8rem) var(--section-y); }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(2rem, 1rem + 3vw, 4.5rem);
+  align-items: center;
+}
+@media (max-width: 940px) { .hero-grid { grid-template-columns: 1fr; } }
+
+.hero h1 { font-size: var(--fs-hero); margin-bottom: .45em; }
+.hero h1 .accent {
+  background: linear-gradient(100deg, var(--accent), var(--brand-soft) 55%, var(--green));
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+}
+.hero-lead {
+  max-width: 56ch;
+  font-size: var(--fs-lead);
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+.hero-actions { display: flex; flex-wrap: wrap; gap: .9rem; margin-bottom: 2.5rem; }
+
+.hero-points { display: grid; gap: 1.1rem; }
+.hero-point { display: flex; gap: .9rem; align-items: flex-start; }
+.hero-point p { font-size: .95rem; color: var(--text-muted); margin: 0; }
+.hero-point strong { display: block; color: var(--text); font-family: var(--font-head); font-size: 1rem; }
+
+/* Визуал героя: логотип компании с «дышащим» свечением и скользящим бликом */
+
+/* width обязателен: все дети позиционированы абсолютно, и без явной ширины
+   грид-элемент с auto-полями схлопывается до нуля.
+   align-self: start поднимает логотип к верху блока, а не центрирует его
+   по всей высоте текстовой колонки. */
+.hero-visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / .74;
+  align-self: start;
+}
+@media (max-width: 940px) {
+  .hero-visual { max-width: 560px; margin-inline: auto; align-self: center; }
+}
+
+.logo-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Аура за логотипом */
+.logo-aura {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  /* Эллипс по пропорциям логотипа, а не круг: круг такого размера читается
+     как диск и лезет под шапку. closest-side доводит затухание ровно до края. */
+  width: 118%;
+  aspect-ratio: 2.15;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    rgba(43, 232, 106, .30) 0%,
+    rgba(43, 232, 106, .18) 34%,
+    rgba(3, 153, 155, .11) 56%,
+    rgba(0, 252, 250, .04) 76%,
+    transparent 100%);
+  animation: aura 6.5s var(--ease) infinite;
+}
+@keyframes aura {
+  0%, 100% { transform: scale(.9);   opacity: .68; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+
+/* Логотип: свечение строится по его альфа-каналу, поэтому повторяет контур */
+.logo-mark {
+  position: relative;
+  width: min(100%, 640px);
+  height: auto;
+  filter:
+    drop-shadow(0 0 18px rgba(43, 232, 106, .34))
+    drop-shadow(0 0 52px rgba(3, 153, 155, .26));
+  animation: logoGlow 6.5s var(--ease) infinite;
+}
+@keyframes logoGlow {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 14px rgba(43, 232, 106, .30))
+      drop-shadow(0 0 42px rgba(3, 153, 155, .24));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 28px rgba(43, 232, 106, .60))
+      drop-shadow(0 0 72px rgba(0, 252, 250, .34));
+  }
+}
+
+/* Блик: белая копия логотипа поверх основной, по которой диагональной
+   обрезкой пробегает узкая полоса. Форма повторяется точно, потому что
+   это тот же файл логотипа. */
+.logo-sheen {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(100%, 640px);
+  height: auto;
+  pointer-events: none;
+  opacity: .58;
+  /* brightness(0) гасит цвет, invert(1) делает силуэт белым; альфа сохраняется */
+  filter: brightness(0) invert(1) blur(.4px);
+  clip-path: polygon(-30% 0, -14% 0, -24% 100%, -40% 100%);
+  animation: sheen 6.5s var(--ease) infinite;
+}
+@keyframes sheen {
+  0%        { clip-path: polygon(-30% 0, -14% 0, -24% 100%, -40% 100%); }
+  45%, 100% { clip-path: polygon(124% 0, 140% 0, 130% 100%, 114% 100%); }
+}
+
+/* ------------------------------------------------------------ Метрики */
+
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: clamp(1rem, .6rem + 1vw, 1.5rem); }
+.stat { padding: clamp(1.3rem, 1rem + 1vw, 1.9rem); }
+.stat .num {
+  display: block;
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.03em;
+  background: linear-gradient(120deg, var(--accent), var(--green));
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  margin-bottom: .5rem;
+}
+.stat p { font-size: .93rem; color: var(--text-muted); margin: 0; }
+
+/* ------------------------------------- Карточки групп оборудования 01–04 */
+
+.group-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  /* Верхняя граница снижена с 2rem: в строке из четырёх карточек каждые
+     лишние 4px внутреннего отступа съедаются у заголовка. */
+  padding: clamp(1.5rem, 1.1rem + 1.2vw, 1.75rem);
+  color: var(--text);
+  /* var(--spot) первым слоем — иначе своя заливка перекрыла бы подсветку */
+  background: var(--spot), linear-gradient(168deg, var(--surface-2) 0%, #0A2322 62%, #071B1D 100%);
+}
+.group-card:hover { color: var(--text); }
+/* Отступ фиксированный, а не auto: при auto свободное место карточки делилось
+   между шапкой и ссылкой, и заголовок вставал тем ниже, чем короче подпись, —
+   в ряду заголовки оказывались на разной высоте. Теперь блок «номер + заголовок
+   + подпись» прижат к верху, а ссылку внизу удерживает margin-top: auto у неё. */
+.group-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; }
+.group-card .num {
+  font-family: var(--font-head);
+  font-size: .95rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  color: var(--green);
+}
+/* Размер подобран так, чтобы «Кондиционирование» — самое длинное слово среди
+   названий направлений — помещалось в одну строку в любой колонке сетки,
+   включая самую узкую четырёхколоночную (порог 1200px, см. .grid--4). */
+/* 3.4rem сверху повторяет тот воздух, который раньше давал auto-отступ шапки. */
+.group-card h3 { font-size: clamp(1.02rem, .92rem + .3vw, 1.12rem); margin: 3.4rem 0 .7rem; }
+.group-card p { font-size: .92rem; color: var(--text-muted); margin-bottom: 1.4rem; }
+/* Описания систем занимают от двух до трёх строк, из-за чего разделительная
+   линия и списки номенклатуры в соседних карточках начинались на разной
+   высоте — ряд выглядел неровным. Резервируем под описание три строки,
+   и все списки стартуют с одного уровня. Только когда карточки стоят
+   бок о бок: в одну колонку выравнивать не с чем, а пустое место мешало бы. */
+.group-card .purpose { line-height: 1.6; }
+
+/* Выравнивание внутренностей карточек по строкам общей сетки.
+   Описания систем занимают разное число строк, из-за чего разделительная
+   линия и списки номенклатуры в соседних карточках начинались на разной
+   высоте. Резервировать под описание фиксированную высоту бесполезно:
+   на 1440 хватает трёх строк, на 1200 нужно четыре, и порог зависит
+   от длины текста. Subgrid решает это без магических чисел — карточка
+   наследует строки родительской сетки, и одноимённые элементы во всех
+   карточках встают на один уровень сами.
+
+   Пять строк: шапка с номером, заголовок, список типов, «и многое другое»,
+   ссылка. Оговорка вынесена из списка в отдельную строку именно ради
+   выравнивания: списки разной длины, и внутри общего блока она вставала бы
+   у каждой карточки на своей высоте.
+
+   1fr на строке списка забирает свободное место, поэтому и оговорка,
+   и ссылка прижаты к низу — как раньше делал margin-top: auto. */
+@media (min-width: 620px) {
+  .grid--subrows { grid-template-rows: auto auto 1fr auto auto; }
+  .grid--subrows > .group-card {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 5;
+  }
+}
+
+/* Список типов оборудования — единственное содержимое карточки на странице
+   «Оборудование», поэтому набран крупнее подписей на главной и отделён
+   от заголовка линией. Подзаголовок «Типы оборудования» убран: пояснять
+   нечего, кроме списка в карточке ничего нет. */
+.group-card .nomen {
+  display: grid;
+  gap: .7rem;
+  margin: 0 0 1.1rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--line-soft);
+  font-size: .92rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+.group-card .nomen li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: .6rem;
+}
+/* Зелёная точка — тот же акцент, что у индикаторов направлений и в списках
+   на других страницах: список читается как перечень, а не как серый текст. */
+.group-card .nomen li::before {
+  content: "";
+  width: 5px; height: 5px;
+  margin-top: .55em;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(43, 232, 106, .12);
+}
+/* «и многое другое» — не позиция номенклатуры, поэтому вынесено из списка,
+   набрано без тире и приглушено сильнее самой номенклатуры. */
+.group-card .nomen-more {
+  margin: 0 0 1.4rem;
+  font-size: .85rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+  opacity: .75;
+}
+.group-card .link-arrow { color: var(--accent); margin-top: auto; }
+.group-card::after {
+  content: "";
+  position: absolute;
+  right: -30%;
+  bottom: -45%;
+  width: 75%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(43, 232, 106, .18), transparent 68%);
+  opacity: 0;
+  transition: opacity .35s var(--ease);
+  pointer-events: none;
+}
+.group-card:hover::after { opacity: 1; }
+
+/* ------------------------------------------------- Карточки подкатегорий */
+
+.subcat { padding: 0; display: flex; flex-direction: column; }
+.subcat-media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(160deg, #1C5450, #0E2A2B);
+  overflow: hidden;
+}
+.subcat-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s var(--ease);
+}
+
+/* Режим для настоящих продуктовых фото — вырезов на прозрачном фоне.
+   contain вместо cover: оборудование нельзя обрезать. Ставится на
+   подкатегорию флагом "product" в groups.json. Плитки без флага остаются
+   на cover — там ещё стоят кадры из презентации, заполняющие кадр целиком. */
+.subcat-media--product {
+  padding: clamp(.9rem, .7rem + .6vw, 1.4rem);
+  background: radial-gradient(120% 100% at 50% 0%, #1F5E58, #0C2527 70%);
+}
+.subcat-media--product img { object-fit: contain; }
+.subcat:hover .subcat-media img { transform: scale(1.05); }
+.subcat-body { padding: clamp(1.2rem, 1rem + .7vw, 1.6rem); }
+.subcat-body h3 { font-size: 1.12rem; margin-bottom: .45em; }
+.subcat-body p { font-size: .9rem; color: var(--text-muted); margin: 0; }
+
+/* -------------------------------------------- Карусель типов оборудования */
+
+.slider { position: relative; }
+
+.slider-viewport { padding: 0; overflow: hidden; }
+
+.slider-track {
+  display: flex;
+  transition: transform .68s cubic-bezier(.62, .04, .21, 1);
+  will-change: transform;
+}
+.slider-track > * { flex: 0 0 100%; }
+
+/* Неактивные слайды притушены и чуть уменьшены — это видно в момент
+   перелистывания и придаёт переходу глубину. */
+.slide {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  align-items: center;
+  gap: clamp(1.2rem, .8rem + 1.6vw, 2.6rem);
+  padding: clamp(1.1rem, .8rem + 1vw, 1.8rem);
+  opacity: .22;
+  scale: .94;
+  transition: opacity .5s var(--ease), scale .6s var(--ease);
+}
+.slide.is-active { opacity: 1; scale: 1; }
+/* В одну колонку строки растягивались по высоте самого длинного слайда,
+   и текстовый блок уезжал вниз тем сильнее, чем короче содержимое.
+   Прижимаем содержимое к верху — свободное место собирается снизу. */
+@media (max-width: 760px) {
+  .slide { grid-template-columns: 1fr; align-content: start; }
+}
+
+.slide-media {
+  --pad: 0px;
+  position: relative;
+  aspect-ratio: 16 / 11;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #1C5450, #0E2A2B);
+  overflow: hidden;
+}
+/* Картинка позиционируется абсолютно, размеры заданы явно.
+   Два подводных камня, из-за которых вертикальные фото вылезали за плитку:
+   1) в грид-ячейке высота плитки задана через aspect-ratio и для процентных
+      height/max-height считается неопределённой — проценты не разрешались;
+   2) у абсолютно позиционированных замещаемых элементов width/height: auto
+      берут собственный размер картинки, а inset игнорируется.
+   Здесь контейнер позиционированный, поэтому проценты разрешаются всегда. */
+.slide-media img {
+  position: absolute;
+  inset: var(--pad);
+  width: calc(100% - var(--pad) * 2);
+  height: calc(100% - var(--pad) * 2);
+  object-fit: contain;
+  transition: scale .7s var(--ease);
+}
+/* Режим для фото-вырезов на прозрачном фоне: поля вокруг объекта */
+.slide-media--product {
+  --pad: clamp(.9rem, .7rem + .8vw, 1.6rem);
+  background: radial-gradient(120% 100% at 50% 0%, #1F5E58, #0C2527 70%);
+}
+
+/* Лёгкий наезд картинки при появлении слайда */
+.slide.is-active .slide-media img { scale: 1; }
+.slide .slide-media img { scale: 1.04; }
+
+/* Все слайды одной высоты — по самому длинному. Текстовая колонка при
+   центрировании съезжала вниз тем сильнее, чем короче её содержимое:
+   номер первой позиции стоял на 28px от верха, пятой — на 254px, и при
+   листании нумерация с заголовком прыгали. Прижимаем колонку к верху,
+   картинку оставляем по центру. */
+.slide-body { align-self: start; }
+
+.slide-num {
+  display: inline-block;
+  margin-bottom: .9rem;
+  font-family: var(--font-head);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: var(--green);
+}
+/* Названия позиций занимают то одну строку («Сенсорные панели»), то две
+   («Настенные датчики температуры и влажности»), и текст под ними начинался
+   на 30px выше там, где заголовок короче. Резервируем две строки: длиннее
+   двух ни одно название не бывает даже на 375px. */
+.slide-body h3 {
+  font-size: var(--fs-h3);
+  margin-bottom: .55em;
+  min-height: 2.24em; /* запасной вариант: 2 × line-height заголовков */
+  min-height: 2lh;
+}
+/* Список сразу под заголовком отбивается отступом самого заголовка. Без
+   этого при схлопывании полей побеждает верхний отступ списка, и он
+   встаёт на 6px ниже, чем описание в карточке по соседству. */
+.slide-body h3 + .slide-specs { margin-top: 0; }
+/* min-height держит место под описание: без него высота карусели прыгала бы
+   от слайда к слайду, а незаполненные позиции выглядели бы поломанными */
+.slide-body p { margin: 0; min-height: 4.5em; font-size: .95rem; color: var(--text-muted); }
+
+/* Технические характеристики позиции. Кегль почти как у описания: перечень
+   справочный, но читают его так же внимательно, как текст. Пункты разведены
+   отбивкой — на просвет между строками внутри пункта, чтобы длинные
+   характеристики не слипались в сплошное полотно. */
+.slide-specs {
+  display: grid;
+  gap: .55rem;
+  margin: 1.05rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: .92rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.slide-specs li { position: relative; padding-left: 1.05rem; }
+.slide-specs li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .62em;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  opacity: .75;
+}
+
+.slide-manual { margin-top: 1.4rem; }
+
+/* Карточки изготавливаемого оборудования: название, назначение, состав
+   работ. Назначения у карточек разной длины, поэтому три яруса связаны
+   подсеткой — иначе списки начинались бы на разной высоте. */
+.make-card h3 { font-size: var(--fs-h3); margin-bottom: .5em; }
+.make-card .purpose {
+  color: var(--text-muted);
+  font-size: .95rem;
+  line-height: 1.6;
+  margin: 0 0 1.2rem;
+}
+@media (min-width: 620px) {
+  .grid--make { grid-template-rows: auto auto 1fr; }
+  .grid--make > .make-card { display: grid; grid-template-rows: subgrid; grid-row: span 3; }
+}
+
+/* Заглушка на месте будущего описания */
+.slide-pending {
+  color: var(--text-dim);
+  font-style: italic;
+}
+.slide-pending::before {
+  content: "";
+  display: inline-block;
+  width: 6px; height: 6px;
+  margin-right: .55rem;
+  border-radius: 50%;
+  background: var(--text-dim);
+  vertical-align: middle;
+}
+
+.slider-controls {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 1.4rem;
+}
+
+.slider-btn {
+  display: grid;
+  place-items: center;
+  width: 46px; height: 46px;
+  flex: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  color: var(--text);
+  cursor: pointer;
+  transition: color .2s var(--ease), box-shadow .2s var(--ease), transform .2s var(--ease);
+}
+.slider-btn:hover {
+  color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent), 0 12px 28px -18px rgba(0, 252, 250, .8);
+  transform: translateY(-2px);
+}
+.slider-btn:active { transform: translateY(0); }
+
+.slider-dots { display: flex; gap: .45rem; margin-left: .5rem; }
+.slider-dot {
+  width: 26px; height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(159, 189, 187, .22);
+  cursor: pointer;
+  transition: background .35s var(--ease), width .35s var(--ease);
+}
+.slider-dot:hover { background: rgba(159, 189, 187, .45); }
+.slider-dot[aria-current="true"] {
+  width: 44px;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+}
+
+.slider-counter {
+  margin-left: auto;
+  font-family: var(--font-head);
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  color: var(--text-dim);
+}
+
+/* ------------------------------------------------- Дилерские сертификаты */
+
+/* min(...,100%) обязателен: на узких экранах фиксированный минимум колонки
+   оказывается шире контейнера, и карточка подрезается краем экрана. */
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+  gap: clamp(1rem, .6rem + 1.2vw, 1.75rem);
+}
+
+/* Альбомные документы: колонки шире, чтобы лист не выглядел мелким
+   рядом с высокими книжными карточками */
+.cert-grid--wide {
+  grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr));
+  margin-top: clamp(1rem, .6rem + 1.2vw, 1.75rem);
+}
+.cert-grid--wide:empty { display: none; }
+
+.cert-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  text-align: left;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: zoom-in;
+  width: 100%;
+}
+
+/* Лист документа на светлой подложке — бумага должна читаться как бумага */
+.cert-sheet {
+  position: relative;
+  /* Пропорции рамки повторяют ориентацию документа: книжная по умолчанию,
+     альбомная — с модификатором --wide */
+  aspect-ratio: 1 / 1.15;
+  padding: clamp(.9rem, .7rem + .7vw, 1.4rem);
+  background: linear-gradient(160deg, #16403C, #0B2426);
+  overflow: hidden;
+}
+.cert-sheet img {
+  position: absolute;
+  inset: clamp(.9rem, .7rem + .7vw, 1.4rem);
+  width: calc(100% - clamp(.9rem, .7rem + .7vw, 1.4rem) * 2);
+  height: calc(100% - clamp(.9rem, .7rem + .7vw, 1.4rem) * 2);
+  object-fit: contain;
+  object-position: center top;
+  border-radius: 4px;
+  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, .9);
+  transition: scale .45s var(--ease);
+}
+.cert-sheet--wide { aspect-ratio: 1.34 / 1; }
+.cert-sheet--wide img { object-position: center; }
+
+.cert-card:hover .cert-sheet img { scale: 1.03; }
+
+/* Значок «увеличить» появляется при наведении */
+.cert-zoom {
+  position: absolute;
+  right: .8rem; bottom: .8rem;
+  display: grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(6, 21, 24, .82);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--accent);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .25s var(--ease), transform .25s var(--ease);
+}
+.cert-card:hover .cert-zoom,
+.cert-card:focus-visible .cert-zoom { opacity: 1; transform: none; }
+
+.cert-body { padding: clamp(1rem, .85rem + .6vw, 1.35rem); }
+.cert-brand {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: .3rem;
+  overflow-wrap: break-word;
+}
+.cert-type {
+  display: inline-block;
+  margin-bottom: .6rem;
+  font-size: .74rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+.cert-meta { display: block; font-size: .82rem; color: var(--text-muted); line-height: 1.5; }
+
+.cert-expired {
+  display: inline-block;
+  margin-top: .5rem;
+  padding: .18rem .6rem;
+  border-radius: 999px;
+  background: rgba(255, 154, 154, .12);
+  box-shadow: inset 0 0 0 1px rgba(255, 154, 154, .35);
+  font-size: .7rem;
+  letter-spacing: .04em;
+  color: #FF9A9A;
+}
+
+/* ------------------------------------------------------- Просмотр листа */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  padding: clamp(.8rem, .5rem + 1.4vw, 2rem);
+  background: rgba(4, 14, 16, .93);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s var(--ease), visibility .3s;
+}
+.lightbox.is-open { opacity: 1; visibility: visible; }
+
+.lightbox-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.lightbox-title { font-family: var(--font-head); font-weight: 600; font-size: 1rem; }
+.lightbox-title small { display: block; font-family: var(--font-body); font-weight: 400; font-size: .8rem; color: var(--text-muted); }
+.lightbox-bar .spacer { margin-left: auto; }
+
+.lightbox-stage {
+  position: relative;
+  min-height: 0;
+}
+/* Абсолютное позиционирование с явными размерами: процентные max-height
+   в грид-ячейке не разрешались, и вертикальные сертификаты выводились
+   в натуральную величину, уходя низом за экран.
+   Тень — через filter: drop-shadow, потому что она строится по реальному
+   изображению внутри object-fit: contain, а не по всей области просмотра. */
+.lightbox-stage img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 26px 50px rgba(0, 0, 0, .9));
+  scale: .96;
+  opacity: 0;
+  transition: scale .35s var(--ease), opacity .35s var(--ease);
+}
+.lightbox.is-open .lightbox-stage img { scale: 1; opacity: 1; }
+
+.lightbox-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .8rem;
+}
+.lightbox-counter {
+  font-family: var(--font-head);
+  font-size: .82rem;
+  letter-spacing: .12em;
+  color: var(--text-dim);
+  min-width: 5.5em;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- Бренды */
+
+/* Бегущая лента на главной */
+.marquee {
+  position: relative;
+  overflow: hidden;
+  /* Логотипы подставляет скрипт — держим высоту полосы заранее,
+     иначе при их появлении страница подпрыгивает. */
+  min-height: 116px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: clamp(1rem, .6rem + 1.2vw, 2rem);
+  animation: marquee 46s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Логотипы лежат в assets/img/brands/ уже подготовленными: белый силуэт
+   на прозрачном фоне. Поэтому плитка тёмная, а фильтры не нужны. */
+.brand-tile {
+  display: grid;
+  place-items: center;
+  min-width: 190px;
+  min-height: 116px;
+  padding: 1.1rem 1.4rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .04);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  transition: background .25s var(--ease), box-shadow .25s var(--ease), transform .25s var(--ease);
+}
+.brand-tile:hover {
+  background: rgba(255, 255, 255, .08);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transform: translateY(-3px);
+}
+/* Все файлы логотипов сведены к одному холсту 360x140 (см. README),
+   поэтому одна ширина на всех = одинаковый визуальный размер в любой плитке.
+   max-width нужен, чтобы в бегущей ленте картинка не тянула плитку
+   до своей исходной ширины. */
+.brand-tile img {
+  width: 100%;
+  max-width: 168px;
+  height: auto;
+  object-fit: contain;
+  opacity: .82;
+  transition: opacity .25s var(--ease);
+}
+.brand-tile:hover img { opacity: 1; }
+
+.brand-tile .brand-name {
+  font-family: var(--font-head);
+  font-size: .95rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-align: center;
+}
+
+/* Сетка на странице брендов */
+.brands-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: clamp(.8rem, .5rem + .8vw, 1.25rem); }
+.brands-grid .brand-tile { min-width: 0; min-height: 132px; }
+
+/* На страницах направлений брендов немного — от трёх до девяти. В сетке
+   с auto-fill пустые колонки остаются в строке и прижимают плитки к левому
+   краю. Здесь раскладка гибкая и центрированная: ряд всегда стоит посередине
+   блока, а неполный последний ряд не выглядит обрывом. */
+.brands-grid[data-group-brands] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.brands-grid[data-group-brands] .brand-tile { flex: 0 1 216px; }
+
+.filters { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 2rem; }
+.filter-btn {
+  padding: .6rem 1.15rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  color: var(--text-muted);
+  font-family: var(--font-head);
+  font-size: .84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+}
+.filter-btn:hover { color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.filter-btn[aria-pressed="true"] {
+  background: rgba(0, 252, 250, .12);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+}
+
+.search-field { position: relative; max-width: 340px; margin-bottom: 1.5rem; }
+.search-field input {
+  width: 100%;
+  padding: .85rem 1.1rem .85rem 2.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .04);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: .92rem;
+}
+.search-field input::placeholder { color: var(--text-dim); }
+.search-field svg { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* ------------------------------------------------- Шаги комплексной поставки */
+
+/* Шагов ровно шесть, поэтому колонки заданы жёстко: auto-fit подбирал их
+   по ширине и на больших экранах разбивал ряд как 4 + 2. Три колонки дают
+   два полных ряда и более широкую карточку под длинные описания. */
+.steps {
+  counter-reset: step;
+  display: grid;
+  gap: clamp(1rem, .6rem + 1.2vw, 1.6rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 620px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 940px) { .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.step {
+  counter-increment: step;
+  position: relative;
+  /* Карточка шире базовой, поэтому и внутренний отступ крупнее: иначе текст
+     растягивается на всю ширину и строка становится нечитаемо длинной. */
+  padding: clamp(1.5rem, 1.1rem + 1.4vw, 2.3rem);
+}
+.step::after {
+  content: "0" counter(step);
+  position: absolute;
+  top: clamp(.9rem, .6rem + .8vw, 1.5rem);
+  right: clamp(1.2rem, .9rem + .9vw, 1.9rem);
+  font-family: var(--font-head);
+  font-size: clamp(2.6rem, 2.1rem + 1.4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: rgba(0, 252, 250, .09);
+  pointer-events: none;
+  transition: color .3s var(--ease);
+}
+.step:hover::after { color: rgba(43, 232, 106, .17); }
+/* Иконка в потоке, а не absolute: при абсолютном позиционировании отступ
+   сверху приходилось подбирать вручную, и заголовок налезал на иконку. */
+.step-icon {
+  display: grid;
+  place-items: center;
+  width: 46px; height: 46px;
+  margin-bottom: 1.3rem;
+  border-radius: 14px;
+  background: rgba(0, 252, 250, .1);
+  box-shadow: inset 0 0 0 1px rgba(0, 252, 250, .18);
+  color: var(--accent);
+  transition: background .25s var(--ease), box-shadow .25s var(--ease), color .25s var(--ease);
+}
+/* На наведении карточка «оживает» зелёным — тем же акцентом, что и индикаторы
+   в карточках направлений, чтобы блоки на главной перекликались. */
+.step:hover .step-icon {
+  background: rgba(43, 232, 106, .14);
+  box-shadow: inset 0 0 0 1px rgba(43, 232, 106, .32);
+  color: var(--green);
+}
+/* Линия отделяет иконку от текста и задаёт карточке структуру; на узкую
+   карточку её вешать было незачем, на широкой она держит композицию. */
+.step h3 {
+  font-size: 1.1rem;
+  margin-bottom: .5em;
+  padding-top: 1.3rem;
+  border-top: 1px solid var(--line-soft);
+}
+.step p { font-size: .93rem; line-height: 1.65; color: var(--text-muted); margin: 0; }
+
+/* --------------------------------------------------- Карта и объекты */
+
+/* Карта во всю ширину, карточки регионов — под ней. Раньше они стояли рядом
+   в две колонки, и карта была вдвое мельче. */
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+}
+
+/* Ни подложки, ни рамки: карта лежит прямо на фоне секции. Свечение под
+   страной и бегущий блик рисует сам SVG, поэтому «перелив» никуда не делся.
+   --map-pad остаётся: по нему позиционируется слой блика. */
+.map-wrap {
+  --map-pad: 0px;
+  position: relative;
+  /* Карту рисует main.js уже после загрузки страницы. Без запаса по высоте
+     блок сначала нулевой, а потом раскрывается на 670px и толкает вниз всё
+     содержимое — самый крупный сдвиг вёрстки на сайте. Пропорция взята
+     из viewBox карты, поэтому место резервируется на любой ширине. */
+  aspect-ratio: 1076 / 599;
+}
+.ru-map { width: 100%; height: auto; display: block; }
+/* Заливка силуэта без обводки — берег рисует отдельный слой .coast */
+.ru-map .coast {
+  stroke: rgba(180, 226, 222, .42);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+}
+/* Границы субъектов — фон, а не содержание: линия тоньше и бледнее береговой,
+   чтобы читался силуэт страны, а деталировка только угадывалась. */
+.ru-map .regions {
+  stroke: rgba(180, 226, 222, .17);
+  stroke-width: .7;
+  stroke-linejoin: round;
+}
+
+/* Обязательная по ODbL подпись к данным OpenStreetMap. Держим её предельно
+   скромной: карта — иллюстрация, подпись не должна перетягивать внимание,
+   но и прятать её нельзя. */
+/* Без реакции на наведение: подпись служебная, привлекать к ней внимание
+   не нужно. Подчёркивание остаётся — по нему видно, что это ссылка. */
+.map-credit {
+  margin: .4rem 0 0;
+  text-align: right;
+  font-size: .58rem;
+  letter-spacing: .02em;
+  color: var(--text-dim);
+  opacity: .45;
+}
+.map-credit a { color: inherit; text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; }
+/* Глобальное a:hover подсвечивает любые ссылки и по специфичности равно
+   правилу выше — сейчас его гасит только порядок строк в файле. Гасим явно,
+   чтобы подсветка не вернулась при перестановке блоков CSS. */
+.map-credit a:hover { color: inherit; }
+
+/* Блик по стране: копия контура, по которой пробегает светлая полоса */
+.ru-map-sheen {
+  position: absolute;
+  left: var(--map-pad);
+  top: var(--map-pad);
+  width: calc(100% - var(--map-pad) * 2);
+  height: auto;
+  pointer-events: none;
+  opacity: .22;
+  clip-path: polygon(-25% 0, -10% 0, -22% 100%, -37% 100%);
+  animation: mapSheen 7s var(--ease) infinite;
+}
+@keyframes mapSheen {
+  0%        { clip-path: polygon(-25% 0, -10% 0, -22% 100%, -37% 100%); }
+  55%, 100% { clip-path: polygon(115% 0, 130% 0, 118% 100%, 103% 100%); }
+}
+
+/* Точки некликабельны — карта только иллюстрирует географию */
+.map-pin { pointer-events: none; }
+.map-pin .halo { fill: var(--green); opacity: .22; transform-box: fill-box; transform-origin: center; animation: ping 3s var(--ease) infinite; }
+.map-pin .core { fill: #EAFFF2; stroke: var(--green); stroke-width: 2.5; }
+/* Подпись с тёмной обводкой, чтобы читалась поверх контура страны.
+   Шрифт — Inter, как у основного текста сайта: Montserrat здесь работал
+   как заголовочный и делал названия городов тяжелее, чем им положено.
+   Inter к тому же рассчитан на мелкие кегли и читается на карте лучше. */
+.map-pin .label {
+  fill: var(--text);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  pointer-events: none;
+  paint-order: stroke fill;
+  stroke: rgba(6, 21, 24, .92);
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+}
+.map-pin:nth-of-type(2n) .halo { animation-delay: .7s; }
+.map-pin:nth-of-type(3n) .halo { animation-delay: 1.4s; }
+
+/* На телефоне SVG ужимается втрое: подписи выходят высотой около 6px и
+   превращаются в кашу, а точки — в едва заметные крапины. Поэтому подписи
+   скрываем, а точки увеличиваем через геометрические свойства SVG (r —
+   полноценное CSS-свойство для circle). Карта читается как схема охвата. */
+@media (max-width: 600px) {
+  .map-pin .label { display: none; }
+  .map-pin .core { r: 15px; stroke-width: 4; }
+  .map-pin .halo { r: 21px; }
+}
+@keyframes ping {
+  0%   { transform: scale(.7); opacity: .38; }
+  70%  { transform: scale(2.3); opacity: 0; }
+  100% { transform: scale(2.3); opacity: 0; }
+}
+
+/* Под картой карточки идут в ряд, а не столбцом: на всю ширину контейнера
+   столбец из трёх-четырёх блоков растянулся бы на пол-экрана. */
+.region-list { display: grid; gap: clamp(.8rem, .5rem + .8vw, 1.25rem); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 660px)  { .region-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .region-list { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); } }
+
+.region-card { padding: clamp(1.3rem, 1rem + .9vw, 1.7rem); text-align: left; }
+.region-card h3 { display: flex; align-items: center; gap: .7rem; font-size: 1.05rem; margin-bottom: .4em; }
+.region-card p { font-size: .9rem; line-height: 1.6; color: var(--text-muted); margin: 0; }
+
+.map-cta { display: flex; justify-content: center; }
+
+.project-card { padding: 0; overflow: hidden; }
+/* 3/2 близко к пропорциям исходных снимков — кадрирование минимально.
+   object-position: left top обязателен: в левом верхнем углу фотографий
+   стоит подпись об источнике, и центрированный кадр её срезал бы. */
+/* Фотография — кнопка: открывает снимок во весь экран. Сбрасываем всё,
+   что браузер рисует у кнопки по умолчанию, оставляя саму плитку. */
+.project-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--bg-3);
+  cursor: pointer;
+}
+.project-media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: left top;
+  transition: transform .55s var(--ease);
+}
+.project-card:hover .project-media img { transform: scale(1.05); }
+
+/* Значок лупы — тот же, что на плитках сертификатов: подсказывает, что
+   снимок открывается целиком. Появляется при наведении и по табуляции. */
+.project-zoom {
+  position: absolute;
+  right: .8rem; bottom: .8rem;
+  display: grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(6, 21, 24, .82);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--accent);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .25s var(--ease), transform .25s var(--ease);
+}
+.project-card:hover .project-zoom,
+.project-media:focus-visible .project-zoom { opacity: 1; transform: none; }
+.project-body { padding: clamp(1.2rem, 1rem + .7vw, 1.6rem); }
+/* Названия объектов занимают одну строку («Керакский тоннель») или две
+   («Остановочный пункт «Кутузовская»»), из-за чего метки под ними вставали
+   на разной высоте. Резервируем две строки — метки выстраиваются в ряд. */
+.project-body h3 {
+  font-size: 1.08rem;
+  margin-bottom: .35em;
+  min-height: 2.16em; /* запасной вариант: 2 × line-height заголовков */
+  min-height: 2lh;
+}
+/* Метки идут в столбик, по одной на строку: регион, затем тип объекта.
+   В строку они ложились по-разному — «Москва · Гражданские объекты»
+   умещалась, «Дальний Восток · Транспортная инфраструктура» переносилась,
+   и карточка становилась выше соседних по ряду на 37px.
+   align-items: flex-start не даёт «таблеткам» растянуться на всю ширину.
+   min-height держит два ряда, даже если у объекта окажется одна метка.
+   --tag-h повторяет формулу высоты метки: поля сверху и снизу плюс строка. */
+.project-meta {
+  --tag-h: calc(.6rem + .74rem * 1.65);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .5rem;
+  margin-top: .9rem;
+  min-height: calc(2 * var(--tag-h) + .5rem);
+}
+.tag {
+  padding: .3rem .75rem;
+  border-radius: 999px;
+  background: rgba(0, 252, 250, .08);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: .74rem;
+  letter-spacing: .04em;
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------- Списки преимуществ */
+
+.check-list { display: grid; gap: .9rem; }
+.check-list li { display: flex; gap: .8rem; align-items: flex-start; font-size: .95rem; color: var(--text-muted); }
+.check-list svg { flex: none; margin-top: .25rem; color: var(--green); }
+.check-list strong { color: var(--text); }
+
+/* ------------------------------- Панель собственного производства */
+
+/* Все соседние секции главной — сетки одинаковых плиток. Собственное
+   производство отличается от них по смыслу (свой завод, а не дилерская
+   поставка), поэтому и по форме: одна широкая панель с рендером слева. */
+.prod-panel {
+  padding: 0;
+  display: grid;
+  /* Текстовой колонке отдано больше места, чем рендеру: заголовок здесь
+     набран общим для главной кеглем --fs-h2, и в узкой колонке он рвался
+     на три строки, а лид — на пять с одиноким словом в конце. */
+  grid-template-columns: minmax(0, .66fr) minmax(0, 1fr);
+  align-items: center;
+}
+/* Плитки приподнимаются под курсором, но панель во всю ширину контейнера
+   от такого движения только дёргается. Бегущую подсветку .card оставляем. */
+.prod-panel:hover { transform: none; box-shadow: none; }
+
+.prod-panel__media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: clamp(1.8rem, 1.2rem + 2.4vw, 3.2rem);
+}
+/* Корпус контроллера светло-серый: на тёмном фоне он висел бы в пустоте.
+   Пятно даёт ему опору, не превращая половину панели в светлую плиту,
+   как это сделано в карточках на странице продукции. */
+.prod-panel__media::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    rgba(0, 252, 250, .17), rgba(43, 232, 106, .06) 55%, transparent 78%);
+  pointer-events: none;
+}
+.prod-panel__media img {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  height: auto;
+  filter: drop-shadow(0 20px 32px rgba(0, 0, 0, .55));
+}
+
+.prod-panel__body { padding: clamp(1.5rem, 1rem + 1.8vw, 2.8rem); }
+/* Кегль — общий для заголовков секций главной, иначе панель выбивается
+   из ряда. Название бренда в разметке связано неразрывным пробелом,
+   поэтому строка ломается после «Автоматика», а не посреди Linma. */
+.prod-panel__body h2 { font-size: var(--fs-h2); margin-bottom: .5em; }
+.prod-panel__lede {
+  color: var(--text-muted);
+  font-size: clamp(.98rem, .93rem + .3vw, 1.1rem);
+  line-height: 1.62;
+  margin-bottom: 1.5rem;
+  /* Абзац раскладывался с рваным правым краем и коротким хвостом на
+     последней строке: браузер ломает строки жадно, по одной. Здесь он
+     учитывает абзац целиком — на узкой ширине хотя бы убирает висячее
+     слово, в колонке рядом с рендером выравнивает строки между собой
+     (разброс правого края падает с 397 до 181 пикселя). */
+  text-wrap: pretty;
+}
+@media (min-width: 900px) {
+  .prod-panel__lede { text-wrap: balance; }
+}
+.prod-panel .check-list { margin-bottom: 1.8rem; }
+
+@media (max-width: 900px) {
+  .prod-panel { grid-template-columns: minmax(0, 1fr); }
+  .prod-panel__media { padding: clamp(1.5rem, 1rem + 2vw, 2.4rem) 1.5rem 0; }
+  .prod-panel__media img { max-width: 320px; }
+}
+
+/* --------------------------------------------------------- Продукция */
+
+.product-card { padding: 0; display: flex; flex-direction: column; }
+/* Светлая подложка: часть фотографий продукции — JPEG с белым фоном,
+   часть — PNG с прозрачностью. Общая плита приводит их к одному виду. */
+.product-media {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  padding: 1.5rem;
+  background: linear-gradient(160deg, #F6FAFA, #DCE7E6);
+}
+.product-media img { max-height: 100%; width: auto; object-fit: contain; }
+.product-body { padding: clamp(1.2rem, 1rem + .7vw, 1.6rem); }
+.product-body h3 { font-size: 1.05rem; margin-bottom: .4em; }
+.product-body p { font-size: .88rem; color: var(--text-muted); margin: 0; }
+
+/* -------------------------------------------------------------- Форма */
+
+.form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: clamp(1.6rem, 1rem + 2.4vw, 3.5rem);
+  align-items: start;
+}
+@media (max-width: 900px) { .form-layout { grid-template-columns: 1fr; } }
+
+.form-card { padding: clamp(1.5rem, 1.1rem + 1.6vw, 2.6rem); }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.field { display: flex; flex-direction: column; gap: .45rem; }
+.field--full { grid-column: 1 / -1; }
+.field label { font-size: .82rem; font-weight: 500; color: var(--text-muted); letter-spacing: .02em; }
+.field label .req { color: var(--green); }
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: .9rem 1.05rem;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .04);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: .95rem;
+  transition: box-shadow .2s var(--ease), background .2s var(--ease);
+}
+.field textarea { min-height: 128px; resize: vertical; }
+.field input::placeholder, .field textarea::placeholder { color: var(--text-dim); }
+.field input:focus, .field textarea:focus {
+  outline: none;
+  background: rgba(255, 255, 255, .06);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.field.has-error input, .field.has-error textarea { box-shadow: inset 0 0 0 1px #FF6B6B; }
+.field-error { display: none; font-size: .78rem; color: #FF9A9A; }
+.field.has-error .field-error { display: block; }
+
+/* Расшифровка звёздочек. Нужна из-за телефона и e-mail: помечены оба,
+   но форма принимает и одно из двух — без пояснения пометка обманывала бы. */
+.form-note {
+  margin: 1.1rem 0 0;
+  font-size: .8rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.form-note .req { color: var(--green); }
+
+/* ---- Разметка Contact Form 7 ----
+   Нужна только в версии сайта на WordPress: плагин оборачивает каждое поле
+   в свой <span> и выводит собственные сообщения об ошибках. На статической
+   версии этих классов нет, и правила просто не срабатывают. */
+.wpcf7-form-control-wrap { display: block; }
+.wpcf7-not-valid-tip { display: block; margin-top: .45rem; font-size: .78rem; color: #FF9A9A; }
+.field .wpcf7-not-valid { box-shadow: inset 0 0 0 1px #FF6B6B; }
+.wpcf7-response-output {
+  margin: 1rem 0 0 !important;
+  padding: .8rem 1rem !important;
+  border: 0 !important;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .04);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: .88rem;
+  color: var(--text-muted);
+}
+.wpcf7-form.invalid .wpcf7-response-output,
+.wpcf7-form.unaccepted .wpcf7-response-output { color: #FF9A9A; }
+.wpcf7-spinner { display: none; }
+
+.consent { display: flex; gap: .7rem; align-items: flex-start; margin: 1.25rem 0; font-size: .82rem; color: var(--text-muted); }
+.consent input { flex: none; width: 18px; height: 18px; margin-top: .16rem; accent-color: var(--green); }
+.consent.has-error { color: #FF9A9A; }
+
+/* Ловушка для ботов вместо капчи */
+.hp-field { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* Окно «Заявка принята» — разметку создаёт main.js после удачной отправки */
+.form-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: grid;
+  place-items: center;
+  padding: var(--gutter);
+  background: rgba(4, 14, 16, .82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .28s var(--ease), visibility .28s;
+}
+.form-modal.is-open { opacity: 1; visibility: visible; }
+
+.form-modal__card {
+  width: min(420px, 100%);
+  padding: clamp(1.75rem, 1.3rem + 1.8vw, 2.5rem);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, var(--surface-solid), rgba(6, 21, 24, .96));
+  box-shadow: inset 0 0 0 1px var(--line), 0 30px 60px -30px rgba(0, 0, 0, .9);
+  text-align: center;
+  scale: .94;
+  transition: scale .32s var(--ease);
+}
+.form-modal.is-open .form-modal__card { scale: 1; }
+
+.form-modal__icon {
+  display: grid;
+  place-items: center;
+  width: 62px; height: 62px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  background: rgba(43, 232, 106, .14);
+  box-shadow: inset 0 0 0 1px rgba(43, 232, 106, .45);
+  color: var(--green);
+}
+.form-modal__card h3 { font-size: var(--fs-h3); margin-bottom: .5em; }
+.form-modal__card p {
+  margin: 0 0 1.75rem;
+  font-size: .95rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.form-status { margin-top: 1rem; font-size: .9rem; min-height: 1.4em; }
+.form-status.is-ok { color: var(--green); }
+.form-status.is-error { color: #FF9A9A; }
+
+.contact-list { display: grid; gap: 1.4rem; }
+.contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+.contact-icon {
+  display: grid;
+  place-items: center;
+  width: 44px; height: 44px;
+  flex: none;
+  border-radius: 13px;
+  background: rgba(0, 252, 250, .1);
+  color: var(--accent);
+}
+/* Наднадпись и значение — строчные элементы, поэтому они текли одной
+   строкой: «ТЕЛЕФОН +7 (495) 142-15-20» помещался, а «РЕЖИМ РАБОТЫ
+   Ежедневно 9:00–18:00» рвался посреди значения. Ставим наднадпись
+   отдельной строкой — все три карточки набираются одинаково. */
+.contact-item .label {
+  display: block;
+  margin-bottom: .25rem;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.contact-item .value { font-family: var(--font-head); font-size: 1.05rem; font-weight: 600; color: var(--text); }
+a.contact-item:hover .value { color: var(--accent); }
+
+/* Реквизиты: код слева, значение справа. Значения набраны заголовочным
+   шрифтом — цифры в нём моноширинные, столбец читается как таблица. */
+.requisites {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .6rem 1.4rem;
+  margin: 1rem 0 0;
+  font-size: .95rem;
+}
+.requisites dt {
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  align-self: center;
+}
+/* Двоеточие рисуем стилями, а не пишем в разметке: при копировании
+   реквизитов в письмо или счёт лишний знак не попадёт в буфер. */
+.requisites dt::after { content: ":"; }
+.requisites dd {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--text);
+}
+
+/* --------------------------------------------------------- CTA-полоса */
+
+.cta-band {
+  position: relative;
+  padding: clamp(2.2rem, 1.5rem + 3vw, 4rem);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(120deg, rgba(3, 153, 155, .28), rgba(0, 55, 150, .22) 55%, rgba(43, 232, 106, .16));
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+}
+.cta-band .inner {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.cta-band h2 { font-size: var(--fs-h3); margin: 0 0 .4em; max-width: 22ch; }
+.cta-band p { color: var(--text-muted); margin: 0; max-width: 46ch; font-size: .95rem; }
+
+/* --------------------------------------------------------- Хлебные крошки */
+
+.breadcrumbs { display: flex; flex-wrap: wrap; gap: .5rem; font-size: .82rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+.breadcrumbs a { color: var(--text-dim); }
+.breadcrumbs a:hover { color: var(--accent); }
+.breadcrumbs li:not(:last-child)::after { content: "/"; margin-left: .5rem; color: var(--text-dim); opacity: .5; }
+.breadcrumbs ol { display: contents; }
+
+/* -------------------------------------------------- Шапка внутренней */
+
+.page-hero { padding-block: clamp(2.5rem, 1.6rem + 3.4vw, 5rem) clamp(2rem, 1.4rem + 2.4vw, 3.5rem); }
+.page-hero h1 { font-size: var(--fs-h1); margin-bottom: .4em; }
+.page-hero .lead { max-width: 62ch; font-size: var(--fs-lead); color: var(--text-muted); }
+.page-hero .group-num {
+  display: inline-flex;
+  align-items: center;
+  gap: .8rem;
+  margin-bottom: 1.2rem;
+  font-family: var(--font-head);
+  font-size: .95rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--green);
+}
+
+/* -------------------------------------------------------------- Подвал */
+
+.site-footer {
+  margin-top: var(--section-y);
+  padding-block: clamp(2.75rem, 2rem + 2.4vw, 4.5rem) 2rem;
+  border-top: 1px solid var(--line-soft);
+  background: rgba(4, 15, 17, .55);
+}
+.footer-grid {
+  display: grid;
+  /* Колонки переносятся сами; жёсткие пропорции включаются только
+     на десктопе, иначе на 480px колонки сжимались до нечитаемых 51px. */
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: clamp(1.75rem, 1rem + 2.4vw, 3.5rem);
+  margin-bottom: 2.5rem;
+}
+@media (min-width: 1000px) {
+  .footer-grid { grid-template-columns: 1.5fr 1fr 1fr 1.25fr; }
+}
+.footer-brand img { width: 132px; margin-bottom: 1.2rem; }
+.footer-brand p { font-size: .9rem; color: var(--text-muted); max-width: 38ch; }
+.footer-col h4 {
+  font-size: .76rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.1rem;
+}
+.footer-col li + li { margin-top: .65rem; }
+.footer-col a { color: var(--text-muted); font-size: .92rem; }
+.footer-col a:hover { color: var(--accent); }
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line-soft);
+  font-size: .82rem;
+  color: var(--text-dim);
+}
+.footer-bottom a { color: var(--text-dim); }
+.footer-bottom a:hover { color: var(--accent); }
+
+/* ------------------------------------------------------------ Анимации */
+
+/* Появление использует отдельное свойство translate, а не transform.
+   Через transform оно перебивало .card:hover (та же специфичность, но правило
+   идёт ниже по файлу) — и подъём карточки при наведении не работал.
+   translate и transform складываются, поэтому теперь они не конфликтуют. */
+/* Блоки проявляются на месте, без выезда снизу.
+   Раньше здесь было translate: 0 26px — содержимое всплывало при загрузке
+   и при прокрутке. Формально это не сдвиг вёрстки, приборы его не считают,
+   но глазом это ровно то же движение, и на первом экране так всплывало
+   сразу шесть блоков. Оставили только проявление: оживление сохраняется,
+   ничего не двигается. */
+[data-reveal] {
+  opacity: 0;
+  transition: opacity .7s var(--ease);
+}
+[data-reveal].is-visible { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  [data-reveal] { opacity: 1; }
+}
+
+/* -------------------------------------------------- Утилиты и мелочи */
+
+.text-muted { color: var(--text-muted); }
+/* Ровный правый край для коротких абзацев. Браузер по умолчанию ломает
+   строки жадно, слева направо, и последняя строка вырождается в одно
+   слово; здесь он раскладывает абзац целиком и выравнивает строки между
+   собой. Только для коротких блоков: длинные абзацы браузер балансировать
+   не станет — и не надо, там ровный край не нужен. */
+.text-even { text-wrap: balance; }
+.mt-sm { margin-top: 1rem; }
+.mt-md { margin-top: 2rem; }
+.mt-lg { margin-top: clamp(2rem, 1.4rem + 2vw, 3.5rem); }
+.prose p { color: var(--text-muted); font-size: var(--fs-lead); }
+.prose h2 { font-size: var(--fs-h2); margin-top: 2.2em; }
+.prose h3 { font-size: var(--fs-h3); margin-top: 1.8em; }
+.prose ul { margin: 0 0 1.2em; display: grid; gap: .6rem; }
+.prose li { display: flex; gap: .7rem; color: var(--text-muted); }
+.prose li::before { content: "—"; color: var(--green); flex: none; }
+
+/* =========================================================== Правовая страница
+
+   Раскладка длинного юридического текста: слева липкое оглавление с подсветкой
+   текущего раздела, справа — сам документ. Ниже 1080px оглавление превращается
+   в горизонтальную ленту над текстом, чтобы не занимать экран.
+   ========================================================================== */
+
+.legal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.75rem, 1rem + 2.4vw, 3.25rem);
+}
+@media (min-width: 1080px) {
+  .legal-layout { grid-template-columns: 258px minmax(0, 1fr); align-items: start; }
+}
+
+/* ---- Оглавление ---- */
+
+.legal-toc {
+  position: relative;
+  padding: 1.35rem 1.25rem;
+  border-radius: var(--radius);
+  background: linear-gradient(165deg, rgba(18, 54, 52, .5), rgba(6, 21, 24, .5));
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+@media (min-width: 1080px) {
+  /* 96px — та же величина, что и scroll-padding-top у html: заголовок раздела
+     не должен уезжать под шапку при переходе по якорю. */
+  .legal-toc { position: sticky; top: calc(96px + .75rem); }
+}
+.legal-toc__title {
+  margin: 0 0 1rem;
+  font-family: var(--font-head);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.legal-toc ol { display: grid; gap: .15rem; }
+.legal-toc a {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  gap: .4rem;
+  align-items: baseline;
+  padding: .5rem .6rem;
+  border-radius: 9px;
+  font-size: .84rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  transition: background .2s var(--ease), color .2s var(--ease);
+}
+.legal-toc a .n {
+  font-family: var(--font-head);
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--text-dim);
+  transition: color .2s var(--ease);
+}
+.legal-toc a:hover { background: rgba(255, 255, 255, .045); color: var(--text); }
+.legal-toc a[aria-current="true"] {
+  background: rgba(0, 252, 250, .09);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.legal-toc a[aria-current="true"] .n { color: var(--accent); }
+
+/* Ниже 1080px — горизонтальная лента с прокруткой */
+@media (max-width: 1079.98px) {
+  .legal-toc ol {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: .4rem;
+    overflow-x: auto;
+    padding-bottom: .35rem;
+    scrollbar-width: thin;
+  }
+  .legal-toc a { grid-template-columns: none; grid-auto-flow: column; white-space: nowrap; }
+}
+
+/* ---- Шапка документа ---- */
+
+.legal-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  margin-bottom: clamp(1.5rem, 1rem + 1.4vw, 2.25rem);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--line-soft);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+}
+.legal-meta div {
+  padding: 1.1rem 1.25rem;
+  background: linear-gradient(160deg, rgba(18, 54, 52, .55), rgba(6, 21, 24, .72));
+}
+.legal-meta dt {
+  margin-bottom: .45rem;
+  font-family: var(--font-head);
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.legal-meta dd { margin: 0; font-size: .95rem; line-height: 1.4; color: var(--text); }
+
+/* ---- Предупреждение о статусе документа ---- */
+
+.legal-notice {
+  display: flex;
+  gap: 1rem;
+  padding: 1.2rem 1.35rem;
+  margin-bottom: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem);
+  border-radius: var(--radius);
+  background: linear-gradient(150deg, rgba(43, 232, 106, .1), rgba(6, 21, 24, .5));
+  box-shadow: inset 0 0 0 1px rgba(43, 232, 106, .26);
+}
+.legal-notice__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(43, 232, 106, .16);
+  color: var(--green);
+}
+.legal-notice p { margin: 0; font-size: .92rem; line-height: 1.6; color: var(--text-muted); }
+.legal-notice strong { color: var(--text); }
+
+/* ---- Разделы документа ---- */
+
+.legal-section { scroll-margin-top: 96px; }
+.legal-section + .legal-section {
+  margin-top: clamp(2rem, 1.4rem + 1.8vw, 3rem);
+  padding-top: clamp(2rem, 1.4rem + 1.8vw, 3rem);
+  border-top: 1px solid var(--line-soft);
+}
+.legal-section h2 {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: .9rem;
+  align-items: center;
+  margin: 0 0 1rem;
+  font-size: clamp(1.15rem, 1rem + .7vw, 1.6rem);
+  line-height: 1.25;
+}
+.legal-section h2 .num {
+  display: grid;
+  place-items: center;
+  width: 2.1em; height: 2.1em;
+  border-radius: 11px;
+  background: rgba(0, 252, 250, .08);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: .62em;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--accent);
+}
+/* Текст политики выключен по формату: правый край ровный, как в печатной
+   редакции документа.
+
+   Переносы просим, но не рассчитываем на них: русский словарь есть не в
+   каждом браузере. Без переносов выключка держится на растяжении пробелов,
+   а её качество упирается в число слов в строке. Замеры на этой странице:
+   9 слов при 1440px, 8 при 760px, 6 при 620px, 3 при 375px. От восьми слов
+   пробелы расходятся незаметно, ниже — рвут строку провалами, поэтому на
+   узких экранах оставляем обычный левый край. */
+@media (min-width: 760px) {
+  .legal-section p,
+  .legal-section li {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+}
+.legal-section p { margin: 0 0 1rem; font-size: 1rem; line-height: 1.72; color: var(--text-muted); }
+.legal-section p:last-child { margin-bottom: 0; }
+.legal-section ul { margin: 0 0 1rem; display: grid; gap: .55rem; }
+.legal-section li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: .7rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.legal-section li::before {
+  content: "";
+  width: 6px; height: 6px;
+  margin-top: .62em;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(43, 232, 106, .12);
+}
+.legal-section ul:last-child, .legal-section li:last-child { margin-bottom: 0; }
+
+/* Реквизиты Оператора внутри первого раздела */
+.legal-operator {
+  display: grid;
+  gap: .5rem;
+  margin: 1.25rem 0 0;
+  padding: 1.15rem 1.3rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .035);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  font-size: .93rem;
+}
+.legal-operator div { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: .35rem 1rem; }
+.legal-operator dt { color: var(--text-dim); }
+.legal-operator dd { margin: 0; color: var(--text); }
+@media (max-width: 520px) {
+  .legal-operator div { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---- Печать ---- */
+
+@media print {
+  .site-header, .site-footer, .breadcrumbs, .legal-toc, .legal-notice, .legal-cta, .skip-link { display: none !important; }
+  body { background: #fff; color: #000; }
+  .legal-layout { display: block; }
+  .legal-section h2 .num { box-shadow: inset 0 0 0 1px #999; color: #000; background: none; }
+  .legal-section p, .legal-section li, .legal-operator dd, .legal-operator dt { color: #000; }
+  .legal-meta div, .legal-operator { background: none; box-shadow: inset 0 0 0 1px #bbb; }
+  .legal-section { break-inside: avoid; }
+}

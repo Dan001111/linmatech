@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Обработчик формы, отвечать в поиске нечем
+Disallow: /send.php
+
+Sitemap: https://linmatech.ru/sitemap.xml
