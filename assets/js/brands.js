@@ -37,20 +37,18 @@ window.LINMA_BRANDS = [
 
   { name: "VENTZ",         logo: "assets/img/brands/ventz.png",       groups: ["ventilation", "smoke"] },
   { name: "NED",           logo: "assets/img/brands/ned.png",         groups: ["ventilation", "smoke"] },
-  { name: "WHEIL",         logo: "assets/img/brands/wheil.png",       groups: ["ventilation"] },
+  { name: "WHEIL",         logo: "assets/img/brands/wheil.png",       groups: ["ventilation", "smoke"] },
   { name: "Аэро Групп",    logo: "assets/img/brands/aerogroup.png",   groups: ["ventilation"] },
   { name: "Вега",          logo: "assets/img/brands/vega.png",        groups: ["ventilation"] },
-  { name: "Инновент",      logo: "assets/img/brands/innovent.png",    groups: ["ventilation"] },
-  { name: "Нормал Вент",   logo: "assets/img/brands/normalvent.png",  groups: ["ventilation"] },
+  { name: "Инновент",      logo: "assets/img/brands/innovent.png",    groups: ["ventilation", "smoke"] },
+  { name: "Нормал Вент",   logo: "assets/img/brands/normalvent.png",  groups: ["ventilation", "smoke"] },
   { name: "СовПлим",       logo: "assets/img/brands/sovplim.png",     groups: ["ventilation"] },
   { name: "ЯЛКА",          logo: "assets/img/brands/yalka.png",       groups: ["ventilation"] },
 
   { name: "Тепломаш",      logo: "assets/img/brands/teplomash.png",   groups: ["heating"] },
   { name: "KALASHNIKOV",   logo: "assets/img/brands/kalashnikov.png", groups: ["heating"] },
   { name: "ГРЕЕРС",        logo: "assets/img/brands/greers.png",      groups: ["heating"] },
-  { name: "ПК Технология", logo: "assets/img/brands/pk-tech.png",     groups: ["heating"] },
-
-  { name: "СигмаВент",     logo: "assets/img/brands/sigmavent.png",   groups: ["smoke"] }
+  { name: "ПК Технология", logo: "assets/img/brands/pk-tech.png",     groups: ["heating"] }
 ];
 
 /* Подписи направлений — используются в фильтре на странице «Бренды». */
