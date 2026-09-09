@@ -1833,6 +1833,34 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
    Нужна только в версии сайта на WordPress: плагин оборачивает каждое поле
    в свой <span> и выводит собственные сообщения об ошибках. На статической
    версии этих классов нет, и правила просто не срабатывают. */
+
+/* Служебная разметка, которую прячет стилями сам плагин. Его стили
+   отключены в functions.php (оформление формы своё), поэтому эти три
+   правила приходится повторить здесь — иначе над формой появляется
+   пустая рамка от <fieldset> со скрытыми полями, а под кнопкой —
+   пустая рамка от блока сообщений. */
+.wpcf7 .hidden-fields-container {
+  display: none;
+}
+/* Сюда плагин пишет ошибки для программ чтения с экрана. Убираем из
+   поля зрения, но оставляем доступным — display: none сделал бы форму
+   непроходимой для незрячих. */
+.wpcf7 .screen-reader-response {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* Блок сообщений пустует, пока форму не отправили. */
+.wpcf7-form.init .wpcf7-response-output,
+.wpcf7-form.resetting .wpcf7-response-output,
+.wpcf7-form.submitting .wpcf7-response-output {
+  display: none;
+}
+
 .wpcf7-form-control-wrap { display: block; }
 .wpcf7-not-valid-tip { display: block; margin-top: .45rem; font-size: .78rem; color: #FF9A9A; }
 .field .wpcf7-not-valid { box-shadow: inset 0 0 0 1px #FF6B6B; }
