@@ -1842,17 +1842,10 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .wpcf7 .hidden-fields-container {
   display: none;
 }
-/* Сюда плагин пишет ошибки для программ чтения с экрана. Убираем из
-   поля зрения, но оставляем доступным — display: none сделал бы форму
-   непроходимой для незрячих. */
+/* Служебный блок плагина, куда дублируются сообщения об ошибках.
+   На странице не нужен: ошибки и так выводятся под каждым полем. */
 .wpcf7 .screen-reader-response {
-  position: absolute;
-  width: 1px; height: 1px;
-  margin: -1px; padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+  display: none;
 }
 /* Блок сообщений пустует, пока форму не отправили. */
 .wpcf7-form.init .wpcf7-response-output,
