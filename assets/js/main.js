@@ -480,6 +480,16 @@
 
   /* ====================================================== Сертификаты */
 
+  /* Адреса файлов сертификата.
+
+     На статическом сайте они собираются из slug по общему правилу.
+     В WordPress сертификаты заводятся в админке, файлы лежат в медиатеке
+     под своими именами — там шаблон страницы присылает готовые адреса
+     в полях img, thumb и pdf, и правило по имени уже не годится. */
+  function certImg(c)   { return c.img   || asset("img/certificates/" + c.slug + ".jpg"); }
+  function certThumb(c) { return c.thumb || asset("img/certificates/" + c.slug + "-thumb.jpg"); }
+  function certPdf(c)   { return c.pdf   || asset("docs/certificates/" + c.slug + ".pdf"); }
+
   function initCertificates() {
     var grid = document.querySelector("[data-cert-grid]");
     if (!grid) return;
@@ -505,42 +515,55 @@
     var today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Плитки
-    items.forEach(function (c, i) {
-      var card = document.createElement("button");
-      card.type = "button";
-      card.className = "card cert-card";
-      card.setAttribute("aria-label", "Открыть сертификат: " + c.brand);
+    // Плитки могут быть уже отрисованы на сервере — так делает версия
+    // сайта на WordPress. Тогда рисовать их заново нельзя: получилось бы
+    // два комплекта. Достаточно навесить открытие просмотра.
+    var ready = document.querySelectorAll("[data-cert-open]");
 
-      var expired = c.ends && new Date(c.ends) < today;
+    if (ready.length) {
+      ready.forEach(function (card) {
+        card.addEventListener("click", function () {
+          open(parseInt(card.getAttribute("data-cert-open"), 10) || 0);
+        });
+      });
+    } else {
+      items.forEach(function (c, i) {
+        var card = document.createElement("button");
+        card.type = "button";
+        card.className = "card cert-card";
+        card.setAttribute("data-cert-open", i);
+        card.setAttribute("aria-label", "Открыть сертификат: " + c.brand);
 
-      card.innerHTML =
-        '<div class="cert-sheet' + (c.wide ? ' cert-sheet--wide' : '') + '">' +
-          '<img src="' + asset("img/certificates/" + c.slug + "-thumb.jpg") + '" alt="Сертификат ' + c.brand + '" loading="lazy">' +
-          '<span class="cert-zoom" aria-hidden="true">' +
-            '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M7 5v4M5 7h4M10.8 10.8 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
-          '</span>' +
-        '</div>' +
-        '<div class="cert-body">' +
-          '<span class="cert-type">' + c.type + '</span>' +
-          '<span class="cert-brand">' + c.brand + '</span>' +
-          '<span class="cert-meta">' + c.issuer + '</span>' +
-          (expired ? '<span class="cert-expired">Срок истёк</span>' : '') +
-        '</div>';
+        var expired = c.ends && new Date(c.ends) < today;
 
-      card.addEventListener("click", function () { open(i); });
-      (c.wide && wideGrid ? wideGrid : grid).appendChild(card);
-    });
+        card.innerHTML =
+          '<div class="cert-sheet' + (c.wide ? ' cert-sheet--wide' : '') + '">' +
+            '<img src="' + certThumb(c) + '" alt="Сертификат ' + c.brand + '" loading="lazy">' +
+            '<span class="cert-zoom" aria-hidden="true">' +
+              '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M7 5v4M5 7h4M10.8 10.8 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+            '</span>' +
+          '</div>' +
+          '<div class="cert-body">' +
+            '<span class="cert-type">' + c.type + '</span>' +
+            '<span class="cert-brand">' + c.brand + '</span>' +
+            '<span class="cert-meta">' + c.issuer + '</span>' +
+            (expired ? '<span class="cert-expired">Срок истёк</span>' : '') +
+          '</div>';
+
+        card.addEventListener("click", function () { open(i); });
+        (c.wide && wideGrid ? wideGrid : grid).appendChild(card);
+      });
+    }
 
     if (!box) return;
 
     function show(i) {
       index = (i % items.length + items.length) % items.length;
       var c = items[index];
-      stage.src = asset("img/certificates/" + c.slug + ".jpg");
+      stage.src = certImg(c);
       stage.alt = "Сертификат " + c.brand;
       title.innerHTML = c.brand + "<small>" + c.issuer + " · " + c.valid + "</small>";
-      link.href = asset("docs/certificates/" + c.slug + ".pdf");
+      link.href = certPdf(c);
       counter.textContent = (index + 1) + " / " + items.length;
     }
 
