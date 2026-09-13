@@ -1,10 +1,16 @@
 ﻿# Готовит логотип бренда для сайта.
 #
-# Как пользоваться: перетащите файл логотипа (JPG или PNG) прямо на этот
-# скрипт. Рядом с исходником появится готовый PNG — его и загружайте
-# в админке, в карточку бренда.
+# ЗАПУСКАТЬ НЕ ЭТОТ ФАЙЛ, а «Подготовить логотип.bat» рядом с ним:
+# Windows не умеет запускать .ps1 двойным щелчком — открывает их
+# в Блокноте.
 #
-# Можно перетащить сразу несколько файлов.
+# Два способа:
+#   - перетащить файлы логотипов прямо на .bat;
+#   - или просто открыть .bat двойным щелчком — появится окно выбора
+#     файлов.
+#
+# Рядом с исходником появится готовый PNG — его и загружайте в админке,
+# в карточку бренда.
 #
 # ЧТО ДЕЛАЕТ И ЗАЧЕМ
 #
@@ -45,11 +51,22 @@ if (-not (Test-Path $ffmpeg)) {
     exit 1
 }
 
+# Файлы не перетащили — показываем обычное окно выбора.
 if (-not $Files -or $Files.Count -eq 0) {
-    Write-Host 'Перетащите файл логотипа на этот скрипт.' -ForegroundColor Yellow
-    Write-Host 'Либо укажите путь:'
-    $p = Read-Host '  файл'
-    if ($p) { $Files = @($p.Trim('"')) } else { exit 0 }
+    Add-Type -AssemblyName System.Windows.Forms
+    $dlg = New-Object Windows.Forms.OpenFileDialog
+    $dlg.Title = 'Выберите логотипы брендов'
+    $dlg.Filter = 'Изображения (*.jpg;*.jpeg;*.png;*.webp)|*.jpg;*.jpeg;*.png;*.webp|Все файлы (*.*)|*.*'
+    $dlg.Multiselect = $true
+
+    $start = Join-Path $PSScriptRoot ([char]0x041B + [char]0x043E + [char]0x0433 + [char]0x043E + [char]0x0442 + [char]0x0438 + [char]0x043F + [char]0x044B)
+    if (Test-Path $start) { $dlg.InitialDirectory = $start }
+
+    if ($dlg.ShowDialog() -eq [Windows.Forms.DialogResult]::OK) {
+        $Files = $dlg.FileNames
+    } else {
+        exit 0
+    }
 }
 
 # ffmpeg спотыкается о кириллицу в путях, поэтому работаем через
