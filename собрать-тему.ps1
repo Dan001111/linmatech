@@ -25,7 +25,19 @@ Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $theme = Join-Path $PSScriptRoot 'linma-theme'
-$zip   = Join-Path $PSScriptRoot 'linma-theme.zip'
+# Имя архива каждый раз новое — с датой и временем сборки.
+#
+# Это не украшение. WordPress распаковывает загруженную тему во временную
+# папку wp-content/upgrade/<имя архива> и после установки обязан её удалить.
+# На хостинге это удаление однажды не сработало: там застряла папка
+# upgrade/linma-theme-1, и с тех пор каждая новая загрузка файла с тем же
+# именем натыкалась на старый остаток — WordPress сообщал «в теме
+# отсутствует таблица стилей style.css», хотя архив был исправен.
+# С новым именем архив распаковывается в чистую папку.
+#
+# Старые сборки из папки сайта удаляем, чтобы не загрузить случайно их.
+Get-ChildItem $PSScriptRoot -Filter 'linma-theme*.zip' -File -ErrorAction SilentlyContinue | Remove-Item -Force
+$zip   = Join-Path $PSScriptRoot ('linma-theme-' + (Get-Date -Format 'yyyy-MM-dd-HHmm') + '.zip')
 
 if (-not (Test-Path $theme)) {
     Write-Host 'Папка linma-theme не найдена. Положите этот файл рядом с ней.' -ForegroundColor Red
