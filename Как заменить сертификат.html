@@ -1,0 +1,752 @@
+<title>Замена дилерского сертификата</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground:      #F4F7F7;
+    --surface:     #FFFFFF;
+    --surface-alt: #EAF0F0;
+    --ink:         #0E2426;
+    --ink-soft:    #4A6365;
+    --ink-faint:   #7D9294;
+    --line:        #D3DEDE;
+    --line-strong: #B4C4C4;
+    --brand:       #03999B;
+    --accent:      #00706F;
+    --warn:        #A8521C;
+    --warn-bg:     #FBF0E7;
+    --ok:          #147A44;
+    --ok-bg:       #E8F4ED;
+
+    --font-head: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0B1E20;
+      --surface:     #112A2C;
+      --surface-alt: #17383A;
+      --ink:         #E7F2F1;
+      --ink-soft:    #A3BCBB;
+      --ink-faint:   #718C8C;
+      --line:        #23474A;
+      --line-strong: #2F5C5F;
+      --brand:       #2ED3D0;
+      --accent:      #56E3DF;
+      --warn:        #EDA672;
+      --warn-bg:     #2C2117;
+      --ok:          #5FD48C;
+      --ok-bg:       #12301F;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0B1E20;
+    --surface:     #112A2C;
+    --surface-alt: #17383A;
+    --ink:         #E7F2F1;
+    --ink-soft:    #A3BCBB;
+    --ink-faint:   #718C8C;
+    --line:        #23474A;
+    --line-strong: #2F5C5F;
+    --brand:       #2ED3D0;
+    --accent:      #56E3DF;
+    --warn:        #EDA672;
+    --warn-bg:     #2C2117;
+    --ok:          #5FD48C;
+    --ok-bg:       #12301F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4.5rem) clamp(1.1rem, 4vw, 2rem) 5rem;
+  }
+
+  /* ---------------------------------------------------------- шапка */
+
+  .eyebrow {
+    margin: 0 0 .9rem;
+    font-family: var(--font-head);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--brand);
+  }
+
+  h1 {
+    margin: 0 0 .6rem;
+    font-family: var(--font-head);
+    font-size: clamp(1.85rem, 1.2rem + 2.4vw, 2.7rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    max-width: var(--measure);
+    margin: 0;
+    font-size: 1.06rem;
+    color: var(--ink-soft);
+    text-wrap: pretty;
+  }
+
+  /* ------------------------------------------------- схема имён */
+
+  .slug-panel {
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    gap: clamp(1.2rem, 4vw, 2.4rem);
+    align-items: center;
+    margin: 2.6rem 0 0;
+    padding: clamp(1.2rem, 3vw, 1.8rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+
+  .slug-panel__name {
+    display: grid;
+    gap: .5rem;
+    justify-items: start;
+  }
+
+  .slug-panel__label {
+    font-size: .74rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .slug-chip {
+    padding: .5rem .9rem;
+    background: var(--surface-alt);
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .slug-panel__files {
+    display: grid;
+    gap: .55rem;
+    padding-left: clamp(1rem, 3vw, 1.6rem);
+    border-left: 2px solid var(--line);
+  }
+
+  .file-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .35rem 1rem;
+    align-items: baseline;
+  }
+
+  .file-row code {
+    font-family: var(--font-mono);
+    font-size: .9rem;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .file-row code b { font-weight: 500; color: var(--accent); }
+
+  .file-row span {
+    font-size: .78rem;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  /* ------------------------------------------------------- шаги */
+
+  h2 {
+    margin: 3.4rem 0 1.1rem;
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 2.6rem minmax(0, 1fr);
+    gap: 0 1.15rem;
+    padding: 1.6rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .step__num {
+    grid-row: span 2;
+    width: 2.6rem;
+    height: 2.6rem;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: var(--ground);
+    border-radius: 50%;
+    font-family: var(--font-head);
+    font-size: .98rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .step__title {
+    margin: .25rem 0 .5rem;
+    font-family: var(--font-head);
+    font-size: 1.22rem;
+    font-weight: 600;
+    line-height: 1.3;
+    text-wrap: balance;
+  }
+
+  .step__body { max-width: var(--measure); }
+  .step__body > :first-child { margin-top: 0; }
+  .step__body > :last-child { margin-bottom: 0; }
+
+  p { margin: 0 0 .95rem; max-width: var(--measure); }
+
+  ol, ul { margin: 0 0 .95rem; padding-left: 1.3rem; max-width: var(--measure); }
+  li { margin-bottom: .45rem; }
+  li:last-child { margin-bottom: 0; }
+
+  ol.tight { counter-reset: n; list-style: none; padding-left: 0; }
+  ol.tight > li {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+    gap: .6rem;
+    margin-bottom: .6rem;
+  }
+  ol.tight > li::before {
+    counter-increment: n;
+    content: counter(n) ".";
+    font-family: var(--font-mono);
+    font-size: .88rem;
+    color: var(--ink-faint);
+    text-align: right;
+  }
+
+  strong { font-weight: 600; }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: .88em;
+    padding: .1em .34em;
+    background: var(--surface-alt);
+    border-radius: 4px;
+  }
+
+  .block {
+    margin: 0 0 .95rem;
+    padding: .95rem 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow-x: auto;
+  }
+
+  .block pre {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: .84rem;
+    line-height: 1.7;
+    white-space: pre;
+  }
+
+  .block code { padding: 0; background: none; font-size: inherit; }
+
+  .k { color: var(--ink-faint); }
+  .s { color: var(--accent); }
+
+  /* ------------------------------------------------------ врезки */
+
+  .note {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .75rem;
+    margin: 0 0 .95rem;
+    padding: .85rem 1rem;
+    border-radius: 10px;
+    font-size: .93rem;
+    max-width: var(--measure);
+  }
+
+  .note p { margin: 0 0 .5rem; }
+  .note p:last-child { margin: 0; }
+
+  .note__mark {
+    font-family: var(--font-head);
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding-top: .18rem;
+  }
+
+  .note--warn { background: var(--warn-bg); }
+  .note--warn .note__mark { color: var(--warn); }
+  .note--ok { background: var(--ok-bg); }
+  .note--ok .note__mark { color: var(--ok); }
+
+  /* ----------------------------------------------------- таблица */
+
+  .table-scroll { overflow-x: auto; margin: 0 0 .95rem; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .92rem;
+  }
+
+  th, td {
+    padding: .62rem .8rem;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--font-head);
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  td code { white-space: nowrap; }
+
+  /* ------------------------------------------------- контрольный список */
+
+  .checklist {
+    display: grid;
+    gap: .1rem;
+    margin: 0 0 .95rem;
+    padding: 0;
+    list-style: none;
+    max-width: var(--measure);
+  }
+
+  .checklist li {
+    display: grid;
+    grid-template-columns: 1.4rem minmax(0, 1fr);
+    gap: .6rem;
+    align-items: start;
+    padding: .5rem 0;
+    margin: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .checklist li:last-child { border-bottom: 0; }
+
+  .checklist li::before {
+    content: "";
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: .28rem;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 4px;
+  }
+
+  /* -------------------------------------------------------- низ */
+
+  .outro {
+    margin-top: 3.4rem;
+    padding-top: 1.6rem;
+    border-top: 2px solid var(--ink);
+    font-size: .93rem;
+    color: var(--ink-soft);
+  }
+
+  .outro p { max-width: var(--measure); }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">Linma Electronics · сайт</p>
+  <h1>Замена дилерского сертификата</h1>
+  <p class="lede">
+    Страница «Дилерские сертификаты» собирается скриптом из одного файла с описаниями.
+    Чтобы заменить сертификат или добавить новый, нужно подготовить три файла и дописать
+    одну строку. Вёрстку трогать не придётся.
+  </p>
+
+  <div class="slug-panel">
+    <div class="slug-panel__name">
+      <span class="slug-panel__label">Имя латиницей</span>
+      <span class="slug-chip">refcool</span>
+    </div>
+    <div class="slug-panel__files">
+      <div class="file-row">
+        <code>assets/img/certificates/<b>refcool</b>.jpg</code>
+        <span>1200 px</span>
+      </div>
+      <div class="file-row">
+        <code>assets/img/certificates/<b>refcool</b>-thumb.jpg</code>
+        <span>560 px</span>
+      </div>
+      <div class="file-row">
+        <code>assets/docs/certificates/<b>refcool</b>.pdf</code>
+        <span>документ</span>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top:1rem; font-size:.93rem; color:var(--ink-soft);">
+    Одно имя задаёт все три файла сразу. Оно же пишется в строку описания.
+    Если имена разойдутся хотя бы в одном символе — сертификат не появится
+    или откроется без документа.
+  </p>
+
+  <h2>Что понадобится</h2>
+
+  <ul class="checklist">
+    <li>PDF нового сертификата</li>
+    <li>Папка сайта на компьютере — <code>Сайт&nbsp;Линма</code></li>
+    <li>Программа «Ножницы» и Paint — уже есть в Windows</li>
+    <li>Доступ к файлам сайта на хостинге: файловый менеджер reg.ru или FTP</li>
+  </ul>
+
+  <h2>Порядок работы</h2>
+
+  <div class="step">
+    <div class="step__num">1</div>
+    <div>
+      <h3 class="step__title">Придумать имя</h3>
+      <div class="step__body">
+        <p>
+          Короткое слово латиницей, строчными буквами, без пробелов — обычно марка
+          или производитель: <code>refcool</code>, <code>daikin</code>, <code>ventz</code>.
+          Пробелы заменяются дефисом: <code>pk-tech</code>.
+        </p>
+        <p>
+          Посмотрите в <code>assets/js/certificates.js</code>, какие имена уже заняты —
+          они перечислены в поле <code>slug</code>. Повторяться нельзя.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step__num">2</div>
+    <div>
+      <h3 class="step__title">Сделать два изображения из PDF</h3>
+      <div class="step__body">
+        <p>
+          Нужны два снимка одного и того же документа: крупный для просмотра
+          и маленький для плитки.
+        </p>
+
+        <ol class="tight">
+          <li>Откройте PDF двойным щелчком и увеличьте так, чтобы документ занял
+            экран по высоте целиком.</li>
+          <li>Нажмите <code>Win</code> + <code>Shift</code> + <code>S</code> и выделите
+            документ — ровно по краям листа, без полей программы.</li>
+          <li>Откройте Paint, нажмите <code>Ctrl</code> + <code>V</code>.</li>
+          <li>Меню <strong>Изображение → Изменить размер</strong>. Переключитесь
+            на <strong>Пиксели</strong>, галочка «Сохранить пропорции» включена.
+            Поставьте <strong>1200</strong> в длинную сторону: для вертикального
+            документа это высота, для горизонтального — ширина.</li>
+          <li><strong>Файл → Сохранить как → Изображение JPEG</strong>, имя —
+            <code>refcool.jpg</code>.</li>
+          <li>Нажмите <code>Ctrl</code> + <code>Z</code>, чтобы вернуть исходный размер.</li>
+          <li>Снова <strong>Изменить размер</strong>, теперь <strong>560</strong>
+            в длинную сторону. Сохраните как <code>refcool-thumb.jpg</code>.</li>
+        </ol>
+
+        <div class="note note--warn">
+          <span class="note__mark">Важно</span>
+          <div>
+            <p>Не перепутайте порядок: если сначала уменьшить до 560, а потом растянуть
+            до 1200, крупная версия получится размытой. Уменьшать нужно всегда из исходника.</p>
+          </div>
+        </div>
+
+        <p>
+          <strong>Быстрее через онлайн-конвертер.</strong> Любой сервис «PDF в JPG» даст
+          картинку лучшего качества за полминуты. Эти сертификаты и так выложены
+          на сайте в открытом доступе, так что загружать их на сторонний сервис
+          безопасно.
+        </p>
+
+        <div class="note note--warn">
+          <span class="note__mark">Но</span>
+          <div>
+            <p>Это касается <strong>только сертификатов</strong>. Договоры, соглашения
+            о ценах и карточку организации на онлайн-сервисы не загружайте — они
+            не предназначены для публикации.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step__num">3</div>
+    <div>
+      <h3 class="step__title">Разложить файлы по папкам</h3>
+      <div class="step__body">
+        <p>В папке сайта на компьютере:</p>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Файл</th><th>Куда положить</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>refcool.jpg</code></td>
+                <td><code>assets\img\certificates\</code></td>
+              </tr>
+              <tr>
+                <td><code>refcool-thumb.jpg</code></td>
+                <td><code>assets\img\certificates\</code></td>
+              </tr>
+              <tr>
+                <td><code>refcool.pdf</code></td>
+                <td><code>assets\docs\certificates\</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          PDF переименуйте в то же имя — файл от поставщика может называться
+          как угодно, на сайте он должен стать <code>refcool.pdf</code>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step__num">4</div>
+    <div>
+      <h3 class="step__title">Дописать строку в список</h3>
+      <div class="step__body">
+        <p>
+          Откройте <code>assets\js\certificates.js</code> Блокнотом и найдите список,
+          который начинается со строки <code>window.LINMA_CERTIFICATES = [</code>.
+          Добавьте туда строку по образцу:
+        </p>
+
+        <div class="block"><pre><code>{ <span class="k">slug:</span> <span class="s">"refcool"</span>, <span class="k">brand:</span> <span class="s">"Refcool"</span>, <span class="k">issuer:</span> <span class="s">"ООО «Компания»"</span>, <span class="k">type:</span> <span class="s">"Официальный дилер"</span>, <span class="k">valid:</span> <span class="s">"до 31 декабря 2027"</span>, <span class="k">ends:</span> <span class="s">"2027-12-31"</span> },</code></pre></div>
+
+        <p>
+          Место в списке = место на странице. Хотите показать сертификат первым —
+          поставьте строку первой.
+        </p>
+
+        <div class="note note--warn">
+          <span class="note__mark">Важно</span>
+          <div>
+            <p>Кавычки только прямые — <code>"</code>, не «ёлочки». Блокнот их
+            не подменяет, а Word подменяет, поэтому редактируйте Блокнотом.</p>
+            <p>Запятая в конце строки нужна у всех записей, кроме самой последней
+            в списке. Если ставите свою строку в конец — уберите запятую у неё
+            и допишите её предыдущей.</p>
+          </div>
+        </div>
+
+        <p>Что писать в каждом поле:</p>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr><th>Поле</th><th>Что это</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>slug</code></td>
+                <td>Имя из шага 1. Должно совпасть с именами файлов до символа.</td>
+              </tr>
+              <tr>
+                <td><code>brand</code></td>
+                <td>Торговая марка — крупная подпись под плиткой. Можно несколько
+                  через запятую: <code>"LuftMeer, Заслон"</code>.</td>
+              </tr>
+              <tr>
+                <td><code>issuer</code></td>
+                <td>Кто выдал документ, как написано в самом сертификате.</td>
+              </tr>
+              <tr>
+                <td><code>type</code></td>
+                <td>«Официальный дилер», «Партнёр», «Официальный дистрибьютор» —
+                  формулировка из документа.</td>
+              </tr>
+              <tr>
+                <td><code>valid</code></td>
+                <td>Срок действия человеческими словами. Видно только в окне просмотра.</td>
+              </tr>
+              <tr>
+                <td><code>ends</code></td>
+                <td>Дата окончания как <code>2027-12-31</code> — год, месяц, день.
+                  По ней сайт сам повесит плашку «Срок истёк», когда время придёт.
+                  Если срок в документе не указан — оставьте пустые кавычки:
+                  <code>""</code>.</td>
+              </tr>
+              <tr>
+                <td><code>wide</code></td>
+                <td>Только для <strong>горизонтальных</strong> документов — допишите
+                  <code>wide: true</code> перед закрывающей скобкой. Такие карточки
+                  выводятся отдельной сеткой под вертикальными. Для вертикальных
+                  поле не нужно вовсе.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step__num">5</div>
+    <div>
+      <h3 class="step__title">Проверить у себя</h3>
+      <div class="step__body">
+        <p>
+          До заливки на сайт посмотрите, что получилось. В папке сайта лежит
+          <code>serve.ps1</code> — запустите его двойным щелчком правой кнопкой
+          мыши → «Выполнить с помощью PowerShell», затем откройте в браузере:
+        </p>
+
+        <div class="block"><pre><code>http://localhost:8099/certificates.html</code></pre></div>
+
+        <p>Проверьте три вещи:</p>
+        <ul>
+          <li>плитка появилась и картинка на ней видна;</li>
+          <li>по щелчку открывается крупная версия;</li>
+          <li>кнопка со ссылкой на PDF открывает документ.</li>
+        </ul>
+
+        <div class="note note--ok">
+          <span class="note__mark">Готово</span>
+          <div>
+            <p>Если всё три пункта сошлись — файл заполнен правильно, можно заливать.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step__num">6</div>
+    <div>
+      <h3 class="step__title">Залить на сайт</h3>
+      <div class="step__body">
+        <p>
+          Через файловый менеджер хостинга или FTP положите те же четыре файла
+          в тему WordPress:
+        </p>
+
+        <div class="block"><pre><code>wp-content/themes/linma-theme/assets/img/certificates/refcool.jpg
+wp-content/themes/linma-theme/assets/img/certificates/refcool-thumb.jpg
+wp-content/themes/linma-theme/assets/docs/certificates/refcool.pdf
+wp-content/themes/linma-theme/assets/js/certificates.js</code></pre></div>
+
+        <p>
+          Последний файл — тот самый список, который вы правили. Его нужно заменить,
+          иначе картинки лягут, а сертификат не появится.
+        </p>
+
+        <p>
+          Откройте страницу сертификатов на сайте и нажмите <code>Ctrl</code> + <code>F5</code>.
+          Обычное обновление подтянет старый список из кэша браузера, и будет казаться,
+          что ничего не изменилось.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Если сертификат просто продлили</h2>
+
+  <p>
+    Когда марка та же, а документ новый, — имя менять не нужно. Работы меньше:
+  </p>
+
+  <ol class="tight">
+    <li>Сделайте два изображения по шагу 2 и положите их вместо старых —
+      имена те же, файлы перезапишутся.</li>
+    <li>Замените PDF.</li>
+    <li>В <code>certificates.js</code> у этой записи поправьте только
+      <code>valid</code> и <code>ends</code> на новые даты.</li>
+    <li>Проверьте по шагу 5 и залейте по шагу 6.</li>
+  </ol>
+
+  <h2>Если не появилось</h2>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Что видно</th><th>Почему</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Страница пустая, плиток нет вообще</td>
+          <td>Ошибка в <code>certificates.js</code> — чаще всего пропущенная запятая
+            или кривые кавычки. Скрипт перестаёт читаться целиком, поэтому исчезают
+            все сертификаты, а не один.</td>
+        </tr>
+        <tr>
+          <td>Плитка есть, картинки нет</td>
+          <td>Имя файла не совпало с <code>slug</code>. Проверьте регистр
+            и расширение: должно быть <code>.jpg</code>, а не <code>.JPG</code>
+            или <code>.jpeg</code>.</td>
+        </tr>
+        <tr>
+          <td>Картинка есть, PDF не открывается</td>
+          <td>Документ не положен в <code>assets/docs/certificates/</code>
+            или назван иначе.</td>
+        </tr>
+        <tr>
+          <td>Плитка вытянулась или обрезалась</td>
+          <td>Документ горизонтальный, а <code>wide: true</code> не проставлено.
+            Или наоборот — проставлено у вертикального.</td>
+        </tr>
+        <tr>
+          <td>На сайте старое, а у себя новое</td>
+          <td>Кэш браузера либо не заменён <code>certificates.js</code> на сервере.
+            Сначала <code>Ctrl</code> + <code>F5</code>, потом проверьте файл.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note note--ok" style="max-width:var(--measure);">
+    <span class="note__mark">Откат</span>
+    <div>
+      <p>Испортили файл и не понимаете что — возьмите рабочую версию
+      <code>certificates.js</code> из репозитория на GitHub и положите обратно.
+      Все прежние состояния сайта там сохранены.</p>
+    </div>
+  </div>
+
+  <div class="outro">
+    <p>
+      Тем же способом правятся списки брендов, объектов и продукции собственного
+      производства — соседние файлы в <code>assets/js/</code>. Устроены они одинаково,
+      а в начале каждого написано, что означают поля.
+    </p>
+  </div>
+
+</div>
