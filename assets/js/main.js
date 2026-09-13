@@ -28,7 +28,12 @@
   var ASSET_BASE = String(window.LINMA_ASSETS || "assets").replace(/\/+$/, "");
 
   function asset(path) {
-    return ASSET_BASE + "/" + String(path).replace(/^\/+/, "").replace(/^assets\//, "");
+    var p = String(path);
+    // Готовый адрес оставляем как есть. Так приходят файлы из медиатеки
+    // WordPress: они лежат не в папке темы, и достроить путь по имени
+    // нельзя — адрес присылает сервер целиком.
+    if (/^(https?:)?\/\//.test(p) || p.charAt(0) === "/") return p;
+    return ASSET_BASE + "/" + p.replace(/^\/+/, "").replace(/^assets\//, "");
   }
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
