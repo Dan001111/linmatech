@@ -36,6 +36,21 @@
     return ASSET_BASE + "/" + p.replace(/^\/+/, "").replace(/^assets\//, "");
   }
 
+  /* Экранирование для вставки в HTML.
+
+     Названия объектов, брендов и сертификатов на сайте WordPress вводятся
+     в админке. Очистка при сохранении вырезает теги, но кавычки оставляет
+     — а карточки собираются склейкой строк, и кавычка в названии закрыла
+     бы атрибут и позволила дописать свой (в том числе обработчик события).
+     Поэтому любое значение из данных перед вставкой в разметку проходит
+     через esc(). В статической версии данные и так пишет автор сайта, но
+     привычка одна и та же — экранируем всегда. */
+  function esc(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ============================================================ Шапка */
@@ -543,15 +558,15 @@
 
         card.innerHTML =
           '<div class="cert-sheet' + (c.wide ? ' cert-sheet--wide' : '') + '">' +
-            '<img src="' + certThumb(c) + '" alt="Сертификат ' + c.brand + '" loading="lazy">' +
+            '<img src="' + esc(certThumb(c)) + '" alt="Сертификат ' + esc(c.brand) + '" loading="lazy">' +
             '<span class="cert-zoom" aria-hidden="true">' +
               '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M7 5v4M5 7h4M10.8 10.8 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
             '</span>' +
           '</div>' +
           '<div class="cert-body">' +
-            '<span class="cert-type">' + c.type + '</span>' +
-            '<span class="cert-brand">' + c.brand + '</span>' +
-            '<span class="cert-meta">' + c.issuer + '</span>' +
+            '<span class="cert-type">' + esc(c.type) + '</span>' +
+            '<span class="cert-brand">' + esc(c.brand) + '</span>' +
+            '<span class="cert-meta">' + esc(c.issuer) + '</span>' +
             (expired ? '<span class="cert-expired">Срок истёк</span>' : '') +
           '</div>';
 
@@ -567,7 +582,7 @@
       var c = items[index];
       stage.src = certImg(c);
       stage.alt = "Сертификат " + c.brand;
-      title.innerHTML = c.brand + "<small>" + c.issuer + " · " + c.valid + "</small>";
+      title.innerHTML = esc(c.brand) + "<small>" + esc(c.issuer) + " · " + esc(c.valid) + "</small>";
       link.href = certPdf(c);
       counter.textContent = (index + 1) + " / " + items.length;
     }
@@ -640,25 +655,27 @@
       card.className = "card project-card";
       card.setAttribute("data-reveal", i ? String(i * 80) : "");
 
+      var title = esc(p.title);
+
       var tags = (p.tags || []).map(function (t) {
-        return '<span class="tag">' + t + '</span>';
+        return '<span class="tag">' + esc(t) + '</span>';
       }).join("");
 
       card.innerHTML =
         // Кнопка, а не div: фотография открывается во весь экран, и такой
         // просмотр должен работать не только мышью, но и с клавиатуры.
         '<button type="button" class="project-media" data-project-open="' + i + '" ' +
-                'aria-label="Открыть фотографию: ' + p.title + '">' +
-          '<img src="' + projImg(p) + '" alt="' + p.title + '" loading="lazy">' +
+                'aria-label="Открыть фотографию: ' + title + '">' +
+          '<img src="' + esc(projImg(p)) + '" alt="' + title + '" loading="lazy">' +
           '<span class="project-zoom" aria-hidden="true">' +
             '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M7 5v4M5 7h4M10.8 10.8 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
           '</span>' +
         '</button>' +
         '<div class="project-body">' +
-          '<h3>' + p.title + '</h3>' +
+          '<h3>' + title + '</h3>' +
           // Описание необязательно: сейчас карточки идут без него, поле
           // оставлено на случай, если по объекту понадобится пояснение.
-          (p.text ? '<p class="text-muted" style="font-size:.9rem; margin:0;">' + p.text + '</p>' : '') +
+          (p.text ? '<p class="text-muted" style="font-size:.9rem; margin:0;">' + esc(p.text) + '</p>' : '') +
           (tags ? '<div class="project-meta">' + tags + '</div>' : '') +
         '</div>';
 
@@ -764,7 +781,7 @@
       var specs = "";
       if (hasSpecs) {
         specs = '<ul class="slide-specs">';
-        p.specs.forEach(function (s) { specs += '<li>' + s + '</li>'; });
+        p.specs.forEach(function (s) { specs += '<li>' + esc(s) + '</li>'; });
         specs += '</ul>';
       }
 
@@ -772,7 +789,7 @@
       // целиком. Если характеристики есть, а описание не задано, позиция
       // раскрыта достаточно — заглушка выглядела бы недоделкой.
       var text = p.text
-        ? '<p>' + p.text + '</p>'
+        ? '<p>' + esc(p.text) + '</p>'
         : (hasSpecs ? '' : '<p class="slide-pending">Описание будет добавлено</p>');
 
       // Руководство открывается в новой вкладке: карусель листается, и
@@ -794,11 +811,11 @@
 
       slide.innerHTML =
         '<div class="slide-media slide-media--product">' +
-          '<img src="' + asset("img/production/" + p.img) + '" alt="' + p.title + '" loading="lazy">' +
+          '<img src="' + esc(asset("img/production/" + p.img)) + '" alt="' + esc(p.title) + '" loading="lazy">' +
         '</div>' +
         '<div class="slide-body">' +
           '<span class="slide-num">' + (i < 9 ? "0" : "") + (i + 1) + '</span>' +
-          '<h3>' + p.title + '</h3>' +
+          '<h3>' + esc(p.title) + '</h3>' +
           text +
           specs +
           manual +
