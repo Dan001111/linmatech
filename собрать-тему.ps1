@@ -43,6 +43,20 @@ $archive = New-Object IO.Compression.ZipArchive(
     [Text.Encoding]::UTF8
 )
 
+# Сначала записи о папках — с косой чертой на конце и нулевой длиной.
+# Обычные архиваторы их создают, и некоторые распаковщики по ним
+# определяют структуру. Без них архив формально верен, но выглядит
+# непривычно, а WordPress на одном из хостингов такую тему не принял.
+$dirs = New-Object 'System.Collections.Generic.List[string]'
+$dirs.Add('linma-theme/')
+Get-ChildItem $theme -Recurse -Directory | ForEach-Object {
+    $rel = $_.FullName.Substring($theme.Length).TrimStart('\')
+    $dirs.Add('linma-theme/' + ($rel -replace '\\', '/') + '/')
+}
+foreach ($d in ($dirs | Sort-Object -Unique)) {
+    [void]$archive.CreateEntry($d)
+}
+
 $count = 0
 Get-ChildItem $theme -Recurse -File | ForEach-Object {
     $rel  = $_.FullName.Substring($theme.Length).TrimStart('\')
@@ -70,8 +84,9 @@ $ok   = $names -contains 'linma-theme/style.css'
 $size = [math]::Round((Get-Item $zip).Length / 1MB, 1)
 
 # Все ли записи лежат внутри одной папки. Если хоть одна окажется рядом
-# с ней, WordPress сочтёт, что темы в архиве нет.
-$stray = ($names | Where-Object { $_ -notlike 'linma-theme/*' }).Count
+# с ней, WordPress сочтёт, что темы в архиве нет. Сама запись о корневой
+# папке «linma-theme/» при этом законна.
+$stray = ($names | Where-Object { $_ -notlike 'linma-theme/*' -and $_ -ne 'linma-theme/' }).Count
 
 Write-Host ''
 if ($stray -gt 0) {
