@@ -41,6 +41,37 @@ param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Files)
 
 $Gain = 1.3
 
+# Имя готового файла переводим в латиницу.
+#
+# Это не украшательство: файл попадёт в адрес картинки на сайте, а имена
+# с кириллицей веб-серверы отдают неровно — у нас на этом логотип
+# «Совплим» перестал показываться, хотя в медиатеке лежал. Все остальные
+# логотипы на сайте названы латиницей, приводим к тому же виду.
+function Convert-ToLatin([string]$text) {
+    $map = @{
+        'а'='a'; 'б'='b'; 'в'='v'; 'г'='g'; 'д'='d'; 'е'='e'; 'ё'='e';
+        'ж'='zh'; 'з'='z'; 'и'='i'; 'й'='y'; 'к'='k'; 'л'='l'; 'м'='m';
+        'н'='n'; 'о'='o'; 'п'='p'; 'р'='r'; 'с'='s'; 'т'='t'; 'у'='u';
+        'ф'='f'; 'х'='h'; 'ц'='c'; 'ч'='ch'; 'ш'='sh'; 'щ'='sch';
+        'ъ'=''; 'ы'='y'; 'ь'=''; 'э'='e'; 'ю'='yu'; 'я'='ya'
+    }
+
+    $sb = New-Object Text.StringBuilder
+    foreach ($ch in $text.ToLower().ToCharArray()) {
+        $s = [string]$ch
+        if ($map.ContainsKey($s)) {
+            [void]$sb.Append($map[$s])
+        } elseif ($s -match '[a-z0-9]') {
+            [void]$sb.Append($s)
+        } else {
+            [void]$sb.Append('-')
+        }
+    }
+
+    $out = $sb.ToString() -replace '-+', '-'
+    return $out.Trim('-')
+}
+
 $ffmpeg = 'C:\Program Files\GNU Octave\Octave-9.2.0\mingw64\bin\ffmpeg.exe'
 
 if (-not (Test-Path $ffmpeg)) {
@@ -102,9 +133,17 @@ foreach ($f in $Files) {
     & $ffmpeg -y -loglevel error -i $tmpIn -vf $filter $tmpOut 2>&1 | Out-Null
 
     if (Test-Path $tmpOut) {
-        $dest = Join-Path $item.DirectoryName ($base + '-для-сайта.png')
+        $latin = Convert-ToLatin $base
+        if (-not $latin) { $latin = 'logo' }
+
+        $dest = Join-Path $item.DirectoryName ($latin + '-web.png')
         Copy-Item -LiteralPath $tmpOut -Destination $dest -Force
-        Write-Host ("Готово: " + (Split-Path $dest -Leaf)) -ForegroundColor Green
+
+        if ($latin -ne $base.ToLower()) {
+            Write-Host ("Готово: " + (Split-Path $dest -Leaf) + "   (из «" + $item.Name + "»)") -ForegroundColor Green
+        } else {
+            Write-Host ("Готово: " + (Split-Path $dest -Leaf)) -ForegroundColor Green
+        }
         $done++
     } else {
         Write-Host ("Не получилось: " + $item.Name) -ForegroundColor Red
@@ -120,8 +159,12 @@ Write-Host ''
 Write-Host "Обработано: $done" -ForegroundColor Green
 if ($fail -gt 0) { Write-Host "С ошибкой: $fail" -ForegroundColor Red }
 Write-Host ''
-Write-Host 'Файлы с пометкой «-для-сайта» лежат рядом с исходниками.'
-Write-Host 'Откройте их и посмотрите на тёмном фоне — если бледно или'
-Write-Host 'наоборот сплошное пятно, поменяйте $Gain в начале скрипта.'
+Write-Host 'Файлы с пометкой «-web» лежат рядом с исходниками.'
+Write-Host 'Имя переведено в латиницу — с кириллицей в имени картинка'
+Write-Host 'на сайте не показывается.'
+Write-Host ''
+Write-Host 'Откройте результат на тёмном фоне: графика белая, и на белом'
+Write-Host 'фоне файл выглядит пустым. Если бледно или наоборот сплошное'
+Write-Host 'пятно — поменяйте $Gain в начале prepare-logo.ps1.'
 Write-Host ''
 Read-Host 'Enter чтобы закрыть'
