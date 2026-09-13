@@ -618,6 +618,16 @@
 
   /* ============================================================= Объекты */
 
+  /* Адрес фотографии объекта.
+
+     Статическая версия хранит в данных только имя файла (img) — путь
+     собирается по папке assets/img/projects. В WordPress объекты
+     заводятся в админке, и шаблон присылает готовый адрес снимка
+     из медиатеки в поле src. */
+  function projImg(p) {
+    return p.src || asset("img/projects/" + p.img);
+  }
+
   function initProjects() {
     var grid = document.querySelector("[data-projects-grid]");
     if (!grid) return;
@@ -639,7 +649,7 @@
         // просмотр должен работать не только мышью, но и с клавиатуры.
         '<button type="button" class="project-media" data-project-open="' + i + '" ' +
                 'aria-label="Открыть фотографию: ' + p.title + '">' +
-          '<img src="' + asset("img/projects/" + p.img) + '" alt="' + p.title + '" loading="lazy">' +
+          '<img src="' + projImg(p) + '" alt="' + p.title + '" loading="lazy">' +
           '<span class="project-zoom" aria-hidden="true">' +
             '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M7 5v4M5 7h4M10.8 10.8 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
           '</span>' +
@@ -684,7 +694,7 @@
     function show(i) {
       index = (i % items.length + items.length) % items.length;
       var p = items[index];
-      stage.src = asset("img/projects/" + p.img);
+      stage.src = projImg(p);
       stage.alt = p.title;
       title.textContent = p.title;
       counter.textContent = (index + 1) + " / " + items.length;
