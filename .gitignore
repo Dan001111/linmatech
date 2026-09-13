@@ -34,3 +34,7 @@ linma-theme.zip
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Любые архивы — это сборки, их всегда можно пересобрать.
+# Промежуточный update-linma-theme.zip однажды уже попал сюда по ошибке.
+*.zip
