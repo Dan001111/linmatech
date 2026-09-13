@@ -57,8 +57,36 @@ foreach ($d in ($dirs | Sort-Object -Unique)) {
     [void]$archive.CreateEntry($d)
 }
 
+# Что в архив не кладём.
+#
+# Сканы и PDF сертификатов занимали 17 МБ из 27 и нужны были ровно один
+# раз — для переноса сертификатов в админку. После переноса они лежат
+# в медиатеке сайта, а копии в теме только раздували архив: на 25 МБ
+# загрузка срывалась через раз, и WordPress сообщал, что в теме нет
+# style.css — на самом деле просто не долетала часть файла.
+#
+# Оригиналы никуда не делись: они в папке сайта на компьютере и в
+# репозитории. Если перенос когда-нибудь понадобится повторить (например,
+# после переустановки WordPress на боевом домене) — скопируйте эти две
+# папки в тему через файловый менеджер, нажмите кнопку переноса, потом
+# удалите.
+#
+# Логотипы брендов оставлены: они весят 0,2 МБ, а перенос брендов может
+# ещё не быть сделан.
+$skip = @(
+    'assets\docs\certificates',
+    'assets\img\certificates'
+)
+
 $count = 0
-Get-ChildItem $theme -Recurse -File | ForEach-Object {
+$skipped = 0
+Get-ChildItem $theme -Recurse -File | Where-Object {
+    $rel = $_.FullName.Substring($theme.Length).TrimStart('\')
+    $hit = $false
+    foreach ($s in $skip) { if ($rel.StartsWith($s + '\')) { $hit = $true; break } }
+    if ($hit) { $script:skipped++ }
+    -not $hit
+} | ForEach-Object {
     $rel  = $_.FullName.Substring($theme.Length).TrimStart('\')
     $name = 'linma-theme/' + ($rel -replace '\\', '/')
 
@@ -96,6 +124,9 @@ if ($stray -gt 0) {
 }
 if ($ok -and $bad -eq 0) {
     Write-Host "Готово: $count файлов, $size МБ." -ForegroundColor Green
+    if ($skipped -gt 0) {
+        Write-Host "Не вошли сканы и PDF сертификатов ($skipped файлов) — они уже в медиатеке сайта." -ForegroundColor DarkGray
+    }
     Write-Host 'Архив можно загружать: Внешний вид -> Темы -> Добавить новую -> Загрузить тему.'
 } else {
     Write-Host 'Архив собран неправильно:' -ForegroundColor Red
