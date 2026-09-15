@@ -1099,7 +1099,7 @@
           })
           .catch(function () {
             if (status) {
-              status.innerHTML = 'Не удалось отправить заявку. Напишите нам на <a href="mailto:info@linmatech.ru">info@linmatech.ru</a> или позвоните <a href="tel:+74952150652">+7 (495) 215-06-52</a>.';
+              status.textContent = 'Не удалось отправить заявку. Напишите нам на info@linmatech.ru или позвоните +7 (495) 215-06-52.';
               status.className = "form-status is-error";
             }
           })

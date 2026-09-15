@@ -621,6 +621,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   .nav-item--has-menu.is-open > .nav-link::after { transform: translateY(1px) rotate(225deg); }
 
   .nav-mobile-cta { margin-top: 1.75rem; display: grid; gap: .75rem; }
+  /* Телефон в мобильном меню — просто текст, не кнопка и не ссылка. */
+  .nav-mobile-phone { text-align: center; font-family: var(--font-head); font-weight: 600; color: var(--text-muted); padding: .35rem 0; }
 }
 @media (min-width: 1000px) { .nav-mobile-cta { display: none; } }
 
